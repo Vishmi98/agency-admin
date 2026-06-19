@@ -1,0 +1,157 @@
+"use client";
+
+import React from "react";
+import {
+    Box,
+    Button,
+    Grid,
+    Typography,
+    useTheme,
+} from "@mui/material";
+import { Formik, Form, FormikProps, Field, ErrorMessage } from "formik";
+import { toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
+
+import { AttendanceFormValues, AttendanceMarkType } from "../attendanceMarks.types";
+import { addAttendanceMarkInitialValues, addAttendanceValidationSchema } from "../attendanceMarks.utils";
+import { addAttendance } from "../services/attendanceMark.services";
+
+import TextBox from "@/components/TextBox";
+
+
+const AddAttendanceMark = (props: AttendanceFormValues) => {
+    const { handleReload, staffMembers } = props;
+
+    const theme = useTheme();
+
+    const formatTo12Hour = (time: string): string => {
+        const [hours, minutes] = time.split(":").map(Number);
+        const period = hours >= 12 ? "PM" : "AM";
+        const formattedHours = hours % 12 || 12;
+        return `${formattedHours}:${minutes < 10 ? "0" + minutes : minutes} ${period}`;
+    };
+
+    const handleSubmit = async (
+        values: AttendanceMarkType,
+        { resetForm }: { resetForm: () => void }
+    ) => {
+        try {
+            const formattedTime = formatTo12Hour(values.inTime);
+
+            const response = await addAttendance({ ...values, inTime: formattedTime });
+            if (response.success) {
+                toast.success(response.message);
+                handleReload();
+                resetForm();
+            } else {
+                toast.error(response.message);
+            }
+        } catch (error) {
+            toast.error("An error occurred while adding the attendance mark.");
+            console.log(error);
+        }
+    };
+
+    return (
+        <>
+            <Box sx={{ width: "100%" }}>
+                <Typography
+                    variant="h6"
+                    sx={{
+                        fontWeight: "bold",
+                        position: "sticky",
+                        top: 0,
+                        zIndex: 1000,
+                        color: theme.palette.text.primary,
+                        marginBottom: 1
+                    }}
+                >
+                    Enter Attendance
+                </Typography>
+                <Formik
+                    initialValues={addAttendanceMarkInitialValues}
+                    validationSchema={addAttendanceValidationSchema}
+                    onSubmit={handleSubmit}
+                >
+                    {({ touched, errors, isSubmitting, setFieldValue }: FormikProps<AttendanceMarkType>) => (
+                        <Form>
+                            <Box
+                                sx={{
+                                    maxHeight: "400px",
+                                    overflowY: "auto",
+                                    backgroundColor: theme.palette.background.paper,
+                                    width: "100%"
+                                }}
+                            >
+                                <Grid container spacing={1}>
+                                    <Grid item xs={12} md={5}>
+                                        <Typography fontSize="12px">Staff ID</Typography>
+                                        <Field
+                                            as="select"
+                                            name="staffId"
+                                            className="border p-2 w-full"
+                                            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                                                const selectedId = Number(e.target.value);
+                                                setFieldValue('staffId', selectedId);
+                                            }}
+                                        >
+                                            <option value="">Select Staff ID</option>
+                                            {staffMembers.map((staff) => (
+                                                <option key={staff.id} value={staff.id}>
+                                                    {`${staff.firstName} ${staff.lastName} (${staff.id})`}
+                                                </option>
+                                            ))}
+                                        </Field>
+                                        <ErrorMessage name="staffId" component="div" className="text-red-400 text-xs mt-1.5 pl-2" />
+                                    </Grid>
+                                    <Grid item xs={12} md={5}>
+                                        <Typography fontSize="12px">In Time</Typography>
+                                        <TextBox
+                                            name="inTime"
+                                            label=""
+                                            as="input"
+                                            type="time"
+                                            fullWidth
+                                            error={touched.inTime && !!errors.inTime}
+                                            helperText={touched.inTime && errors.inTime}
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12} md={2}>
+                                        <Box
+                                            sx={{
+                                                position: "sticky",
+                                                bottom: 0,
+                                                backgroundColor: theme.palette.background.paper,
+                                                zIndex: 1000,
+                                                width: "100%",
+                                                marginTop: 2.5
+                                            }}
+                                        >
+                                            <Button
+                                                type="submit"
+                                                variant="contained"
+                                                color="primary"
+                                                disabled={isSubmitting}
+                                                sx={{
+                                                    backgroundColor: "#1976d2",
+                                                    borderRadius: "5px",
+                                                    textTransform: "none",
+                                                    "&:hover": { backgroundColor: "#115293" },
+                                                    width: "100%"
+                                                }}
+                                            >
+                                                Add
+                                            </Button>
+                                        </Box>
+                                    </Grid>
+                                </Grid>
+                            </Box>
+                        </Form>
+                    )}
+                </Formik>
+            </Box>
+        </>
+    );
+};
+
+export default AddAttendanceMark;
