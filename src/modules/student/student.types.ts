@@ -75,6 +75,7 @@ export type StudentDataType = {
         };
         id: number;
     };
+    isAgree: boolean;
 };
 
 export type StudentsResponseDataType = {
