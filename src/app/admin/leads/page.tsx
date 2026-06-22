@@ -6,7 +6,6 @@ import AddIcon from '@mui/icons-material/Add';
 
 import { leadPageInitialState, leadPageReducer, LeadPageStateType } from '@/modules/leads/leads.types';
 import { getLeadsData } from '@/modules/leads/leads.service';
-import LeadSearch from '@/modules/leads/ui/LeadSearch';
 import LeadsTable from '@/modules/leads/ui/LeadsTable';
 import AddLeadModal from '@/modules/leads/ui/AddLeadModal';
 

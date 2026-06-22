@@ -4,7 +4,6 @@ import { useCallback, useEffect, useReducer } from 'react';
 import { Button, Box, Typography, useTheme } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 
-import PackageSearch from '@/modules/packages/ui/PackageSearch';
 import { coursePageInitialState, coursePageReducer, CoursePageStateType } from '@/modules/courses/courses.types';
 import { getCoursesData } from '@/modules/courses/services/courses.service';
 import CoursesTable from '@/modules/courses/ui/CoursesTable';

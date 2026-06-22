@@ -4,6 +4,8 @@ import { CoursesResponseDataType, CoursesResponseType, CourseType, CreateCourseR
 
 import apiCall from "@/services/api.services";
 import { URL } from "@/constants/config";
+import { encryptData } from "@/lib/encrypt";
+import { decryptData } from "@/lib/decrypt";
 
 
 export const getWebCoursesData = async (page: number, limit?: number): Promise<WebCoursesResponseDataType> => {
@@ -56,37 +58,56 @@ export const publishWebCourse = async (id: number, isPublish: boolean): Promise<
     };
 };
 
-export const getCoursesData = async (page: number, limit?: number, search?: string): Promise<CoursesResponseDataType> => {
-    const response: CoursesResponseType = await apiCall({
-        url: `${URL}/course/get-all`,
-        method: 'POST',
-        body: { page, limit: limit || 5, search: search || '' },
+export const getCoursesData = async (
+    page: number,
+    limit?: number,
+    search?: string
+): Promise<CoursesResponseDataType> => {
+    const encryptedPayload = encryptData({
+        page,
+        limit: limit || 5,
+        search: search || "",
     });
 
-    const data = response.data || {};
+    const response: CoursesResponseType = await apiCall({
+        url: `${URL}/course/get-all`,
+        method: "POST",
+        body: {
+            payload: encryptedPayload,
+        },
+    });
+
+    const decryptedData = decryptData(response.data);
 
     return {
-        success: response.success ?? false,
-        message: response.message || 'No message provided',
-        courses: data.courses || [],
-        page: data.page ?? 1,
-        limit: data.limit ?? 5,
-        totalPages: data.totalPages ?? 0,
-        totalCourses: data.totalCourses ?? 0,
+        success: response.success,
+        message: response.message,
+        courses: decryptedData.courses,
+        page: decryptedData.page,
+        limit: decryptedData.limit,
+        totalPages: decryptedData.totalPages,
+        totalCourses: decryptedData.totalCourses,
     };
 };
+
 export const createCourse = async (body: CourseType): Promise<CreateCourseResponseDataType> => {
+    const encryptedPayload = encryptData(body);
+
     const response: CreateCourseResponseType = await apiCall({
         url: `${URL}/course/create`,
         method: 'POST',
-        body: body,
+        body: {
+            payload: encryptedPayload,
+        },
     });
+
+    const decryptedData = decryptData(response.data || "");
 
     return {
         success: response.success,
         message: response.message,
         data: {
-            course: response.data,
+            course: decryptedData.course,
         },
     };
 };

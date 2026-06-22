@@ -1,25 +1,35 @@
 import { InquiriesResponseDataType, InquiriesResponseType } from "./inquiries.types";
 
 import { URL } from "@/constants/config";
+import { decryptData } from "@/lib/decrypt";
+import { encryptData } from "@/lib/encrypt";
 import apiCall from "@/services/api.services";
 
 
 export const getInquiriesData = async (page: number, limit?: number, search?: string): Promise<InquiriesResponseDataType> => {
+    const encryptedPayload = encryptData({
+        page,
+        limit: limit || 5,
+        search: search || ''
+    });
+
     const response: InquiriesResponseType = await apiCall({
         url: `${URL}/inquiry/get-all`,
         method: 'POST',
-        body: { page, limit: limit || 5, search: search || '' },
+        body: {
+            payload: encryptedPayload,
+        },
     });
 
-    const data = response.data || {};
+    const decryptedData = decryptData(response.data);
 
     return {
-        success: response.success ?? false,
-        message: response.message || 'No message provided',
-        inquiries: data.inquiries || [],
-        page: data.page ?? 1,
-        limit: data.limit ?? 5,
-        totalPages: data.totalPages ?? 0,
-        totalInquiries: data.totalInquiries ?? 0,
+        success: response.success,
+        message: response.message,
+        inquiries: decryptedData.inquiries,
+        page: decryptedData.page,
+        limit: decryptedData.limit,
+        totalPages: decryptedData.totalPages,
+        totalInquiries: decryptedData.totalInquiries,
     };
 };

@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useReducer } from 'react';
 import { Box, Typography, useTheme } from '@mui/material';
 
-import LeadSearch from '@/modules/leads/ui/LeadSearch';
 import { inquiryPageInitialState, inquiryPageReducer, InquiryPageStateType } from '@/modules/inquiries/inquiries.types';
 import { getInquiriesData } from '@/modules/inquiries/inquiries.service';
 import InquiriesTable from '@/modules/inquiries/ui/InquiriesTable';

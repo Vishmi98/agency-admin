@@ -2,25 +2,36 @@ import { CreateStudentResponseDataType, CreateStudentResponseType, StudentsRespo
 
 import apiCall from "@/services/api.services";
 import { URL } from "@/constants/config";
+import { encryptData } from "@/lib/encrypt";
+import { decryptData } from "@/lib/decrypt";
 
 
 export const getStudentData = async (page: number, limit?: number, search?: string): Promise<StudentsResponseDataType> => {
+    const encryptedPayload = encryptData({
+        page,
+        limit: limit || 5,
+        search: search || ''
+    });
+
+
     const response: StudentsResponseType = await apiCall({
         url: `${URL}/student/get-all`,
         method: 'POST',
-        body: { page, limit: limit || 5, search: search || '' },
+        body: {
+            payload: encryptedPayload,
+        },
     });
 
-    const data = response.data || {};
+    const decryptedData = decryptData(response.data);
 
     return {
-        success: response.success ?? false,
-        message: response.message || 'No message provided',
-        students: data.students || [],
-        page: data.page ?? 1,
-        limit: data.limit ?? 5,
-        totalPages: data.totalPages ?? 0,
-        totalStudents: data.totalStudents ?? 0,
+        success: response.success,
+        message: response.message,
+        students: decryptedData.students,
+        page: decryptedData.page,
+        limit: decryptedData.limit,
+        totalPages: decryptedData.totalPages,
+        totalStudents: decryptedData.totalStudents,
     };
 };
 
@@ -38,17 +49,23 @@ export const getStudentStatuses = async (): Promise<StudentStatusResponseDataTyp
 };
 
 export const createStudent = async (body: StudentType): Promise<CreateStudentResponseDataType> => {
+    const encryptedPayload = encryptData(body);
+
     const response: CreateStudentResponseType = await apiCall({
         url: `${URL}/auth/create_new`,
         method: 'POST',
-        body: body,
+        body: {
+            payload: encryptedPayload,
+        },
     });
+
+    const decryptedData = decryptData(response.data || "");
 
     return {
         success: response.success,
         message: response.message,
         data: {
-            student: response.data,
+            student: decryptedData.student,
         },
     };
 };
@@ -72,30 +89,48 @@ export const createQualification = async (qualificationData: any) => {
 };
 
 export const updateStudent = async (id: string | number, body: StudentType): Promise<UpdateStudentResponseDataType> => {
+    const { id: _, ...restBody } = body;
+
+    const encryptedPayload = encryptData({
+        id,
+        ...restBody,
+    });
+
     const response: UpdateStudentResponseType = await apiCall({
         url: `${URL}/student/update`,
         method: 'POST',
-        body: body,
+        body: {
+            payload: encryptedPayload,
+        },
     });
+
+    const decryptedData = decryptData(response.data || "");
 
     return {
         success: response.success,
         message: response.message,
         data: {
-            student: response.data,
+            student: decryptedData.student,
         },
     };
 };
 
 export const getVisaStatuses = async (): Promise<VisaStatusResponseDataType> => {
+    const encryptedPayload = encryptData({});
+
     const response: VisaStatusResponseType = await apiCall({
         url: `${URL}/visa-status-type/get-all`,
         method: 'POST',
+        body: {
+            payload: encryptedPayload,
+        },
     })
+
+    const decryptedData = decryptData(response.data);
 
     return ({
         success: response.success,
         message: response.message,
-        visaStatusTypes: response.data.visaStatusTypes || []
+        visaStatusTypes: decryptedData.visaStatusTypes || []
     });
 };

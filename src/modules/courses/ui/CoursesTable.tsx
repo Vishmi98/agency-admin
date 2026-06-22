@@ -6,8 +6,6 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 import { CourseDataType, CourseTableProps } from '../courses.types';
 
-import { getCookieUser } from '@/utils/cookie.util';
-
 
 const CoursesTable: React.FC<CourseTableProps> = ({
     totalRows,
@@ -71,20 +69,29 @@ const CoursesTable: React.FC<CourseTableProps> = ({
                         English Requirement
                     </Typography>
 
-                    <Typography variant="body2">
-                        <strong>Test:</strong>{" "}
-                        {course.englishRequirement?.test}
-                    </Typography>
+                    {course.englishRequirement?.map((req, index) => (
+                        <Box
+                            key={index}
+                            sx={{
+                                mb: 2,
+                                p: 1,
+                                border: "1px solid #eee",
+                                borderRadius: 1,
+                            }}
+                        >
+                            <Typography variant="body2">
+                                <strong>Test:</strong> {req.test}
+                            </Typography>
 
-                    <Typography variant="body2">
-                        <strong>Overall Score:</strong>{" "}
-                        {course.englishRequirement?.overallScore}
-                    </Typography>
+                            <Typography variant="body2">
+                                <strong>Overall Score:</strong> {req.overallScore}
+                            </Typography>
 
-                    <Typography variant="body2">
-                        <strong>Minimum Band:</strong>{" "}
-                        {course.englishRequirement?.minimumBand}
-                    </Typography>
+                            <Typography variant="body2">
+                                <strong>Minimum Band:</strong> {req.minimumBand}
+                            </Typography>
+                        </Box>
+                    ))}
                 </Box>
 
                 <Box>

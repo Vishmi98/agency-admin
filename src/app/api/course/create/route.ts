@@ -4,6 +4,8 @@ import { connectDB } from "@/lib/mongodb";
 import { authenticate } from "@/lib/authenticate";
 import { sendErrorResponse, sendSuccessResponse } from "@/services/apiResponse";
 import CourseModel from "@/models/university/course.model";
+import { decryptData } from "@/lib/decrypt";
+import { encryptData } from "@/lib/encrypt";
 
 export async function POST(req: NextRequest) {
     // Authenticate
@@ -14,6 +16,10 @@ export async function POST(req: NextRequest) {
         await connectDB();
 
         const body = await req.json();
+
+        const decryptedBody = decryptData(
+            body.payload
+        );
 
         const {
             title,
@@ -27,13 +33,13 @@ export async function POST(req: NextRequest) {
             specializations = [],
             intakes = [],
             entryRequirements = [],
-            englishRequirement,
+            englishRequirement = [],
             careerOpportunities = [],
             features = [],
             tuitionFee,
             applicationFee,
             isActive = true,
-        } = body;
+        } = decryptedBody;
 
         // Validation
         if (
@@ -42,7 +48,8 @@ export async function POST(req: NextRequest) {
             !level ||
             !credits ||
             !duration ||
-            !englishRequirement?.test
+            !Array.isArray(englishRequirement) ||
+            englishRequirement.length === 0
         ) {
             return sendErrorResponse(
                 "Missing required fields",
@@ -91,9 +98,14 @@ export async function POST(req: NextRequest) {
             updatedDate: new Date(),
         });
 
-        return sendSuccessResponse("Course created successfully", {
+        const encryptedResponse = encryptData({
             course: newCourse,
         });
+
+        return sendSuccessResponse(
+            "Course created successfully!",
+            encryptedResponse
+        );
     } catch (error) {
         console.error("Create Course Error:", error);
         return sendErrorResponse("Server error", 200);

@@ -32,7 +32,7 @@ export interface Course extends Document {
         test: string; // IELTS Academic
         overallScore: number;
         minimumBand: number;
-    };
+    }[];
 
     // Outcomes
     careerOpportunities: string[];
@@ -78,11 +78,13 @@ const courseSchema = new Schema<Course>(
         features: [{ type: String }],
 
         // English requirement (nested object)
-        englishRequirement: {
-            test: { type: String, required: true },
-            overallScore: { type: Number, required: true },
-            minimumBand: { type: Number, required: true },
-        },
+        englishRequirement: [
+            {
+                test: { type: String, required: true }, // IELTS Academic / PTE / TOEFL
+                overallScore: { type: Number, required: true },
+                minimumBand: { type: Number, required: true },
+            },
+        ],
 
         // Pricing
         tuitionFee: { type: Number, default: 0 },

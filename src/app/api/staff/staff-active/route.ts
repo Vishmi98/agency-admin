@@ -4,6 +4,8 @@ import { connectDB } from "@/lib/mongodb";
 import { sendErrorResponse, sendSuccessResponse } from "@/services/apiResponse";
 import StaffModel from "@/models/office/staff.model";
 import { authenticate } from "@/lib/authenticate";
+import { decryptData } from "@/lib/decrypt";
+import { encryptData } from "@/lib/encrypt";
 
 
 export async function POST(req: NextRequest) {
@@ -18,7 +20,10 @@ export async function POST(req: NextRequest) {
         await connectDB();
 
         const body = await req.json();
-        const { staffId, isActive } = body;
+
+        const decryptedBody = decryptData(body.payload || "");
+
+        const { staffId, isActive } = decryptedBody;
 
         if (typeof staffId !== "number" || typeof isActive !== "boolean") {
             return sendErrorResponse("Invalid parameters", 200);
@@ -38,7 +43,17 @@ export async function POST(req: NextRequest) {
         }
 
         const statusText = isActive ? "activated" : "deactivated";
-        return sendSuccessResponse(`Successfully ${statusText} the staff member`, { staff: updated });
+
+        // 🔐 ENCRYPT RESPONSE
+        const encryptedResponse = encryptData({
+            staff: updated,
+            status: statusText,
+        });
+
+        return sendSuccessResponse(
+            `Successfully ${statusText} the staff member`,
+            encryptedResponse
+        );
     } catch (error) {
         return sendErrorResponse("Server error", 200);
     }

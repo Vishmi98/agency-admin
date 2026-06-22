@@ -4,6 +4,8 @@ import { connectDB } from "@/lib/mongodb";
 import { authenticate } from "@/lib/authenticate";
 import { sendErrorResponse, sendSuccessResponse } from "@/services/apiResponse";
 import LeadModel from "@/models/office/lead.model";
+import { decryptData } from "@/lib/decrypt";
+import { encryptData } from "@/lib/encrypt";
 
 export async function POST(req: NextRequest) {
     // Authenticate user
@@ -15,13 +17,17 @@ export async function POST(req: NextRequest) {
 
         const body = await req.json();
 
+        const decryptedBody = decryptData(
+            body.payload
+        );
+
         const {
             studentId,
             staffId,
             courseId,
             status,
             note
-        } = body;
+        } = decryptedBody;
 
         // Validation
         if (!studentId || !staffId || !courseId) {
@@ -57,9 +63,13 @@ export async function POST(req: NextRequest) {
             updatedDate: new Date(),
         });
 
+        const encryptedResponse = encryptData({
+            lead: newLead,
+        });
+
         return sendSuccessResponse(
-            "Lead created successfully",
-            { lead: newLead }
+            "Lead created successfully!",
+            encryptedResponse
         );
     } catch (error) {
         console.error("Create Lead Error:", error);

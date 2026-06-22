@@ -115,7 +115,7 @@ export type CourseType = {
         test: string; // IELTS Academic
         overallScore: number;
         minimumBand: number;
-    };
+    }[];
     careerOpportunities: string[];
     features: string[];
     tuitionFee?: number;
@@ -140,7 +140,7 @@ export type CourseDataType = {
         test: string; // IELTS Academic
         overallScore: number;
         minimumBand: number;
-    };
+    }[];
     careerOpportunities: string[];
     features: string[];
     tuitionFee?: number;
@@ -215,19 +215,13 @@ export type CoursesResponseDataType = {
 export type CoursesResponseType = {
     success: boolean;
     message: string;
-    data: {
-        page: number;
-        limit: number;
-        totalPages: number;
-        totalCourses: number;
-        courses: CourseDataType[];
-    }
+    data: string;
 }
 
 export type CreateCourseResponseType = {
     success: boolean;
     message: string;
-    data: CourseType;
+    data: string;
 }
 
 export type CreateCourseResponseDataType = {

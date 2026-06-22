@@ -2,18 +2,27 @@ import { CountriesResponseDataType, CountriesResponseType, CreateCountryResponse
 
 import apiCall from "@/services/api.services";
 import { URL } from "@/constants/config";
+import { encryptData } from "@/lib/encrypt";
+import { decryptData } from "@/lib/decrypt";
 
 
 export const getCountriesData = async (): Promise<CountriesResponseDataType> => {
+    const encryptedPayload = encryptData({});
+
     const response: CountriesResponseType = await apiCall({
         url: `${URL}/country/get-all`,
         method: 'POST',
+        body: {
+            payload: encryptedPayload,
+        },
     });
+
+    const decryptedData = decryptData(response.data);
 
     return {
         success: response.success,
         message: response.message,
-        countries: response.data.countries || [],
+        countries: decryptedData.countries,
     };
 };
 
@@ -26,17 +35,23 @@ export const createCountrySliderData = async (title: string): Promise<CreateCoun
         },
     };
 
+    const encryptedPayload = encryptData(body);
+
     const response: CreateCountryResponseType = await apiCall({
         url: `${URL}/country/create`,
         method: 'POST',
-        body: body,
+        body: {
+            payload: encryptedPayload,
+        },
     });
+
+    const decryptedData = decryptData(response.data || "");
 
     return {
         success: response.success,
         message: response.message,
         data: {
-            country: response.data,
+            country: decryptedData.country,
         },
     };
 };

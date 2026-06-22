@@ -3,10 +3,10 @@
 import { useMediaQuery, Box, Drawer, Typography } from "@mui/material";
 
 import SidebarItems from "./SidebarItems";
+import Profile from "../header/Profile";
 
 import { SidebarItemType } from "@/type/common.types";
-import { getCookieUser, getUserRollTitle } from "@/utils/cookie.util";
-import Profile from "../header/Profile";
+import { getCookieUser } from "@/utils/cookie.util";
 
 
 const Sidebar = ({

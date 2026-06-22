@@ -53,11 +53,11 @@ export const addCourseInitialValues: CourseType = {
   intakes: [],
   entryRequirements: [],
 
-  englishRequirement: {
+  englishRequirement: [{
     test: "",
     overallScore: 0,
     minimumBand: 0,
-  },
+  }],
 
   careerOpportunities: [],
   features: [],
@@ -104,18 +104,19 @@ export const addCourseValidationSchema = Yup.object().shape({
     .of(Yup.string())
     .min(1, "At least one entry requirement is required"),
 
-  englishRequirement: Yup.object().shape({
-    test: Yup.string()
-      .required("English test is required"),
+  englishRequirement: Yup.array().of(
+    Yup.object().shape({
+      test: Yup.string().required("English test is required"),
 
-    overallScore: Yup.number()
-      .required("Overall score is required")
-      .min(0),
+      overallScore: Yup.number()
+        .required("Overall score is required")
+        .min(0),
 
-    minimumBand: Yup.number()
-      .required("Minimum band score is required")
-      .min(0),
-  }),
+      minimumBand: Yup.number()
+        .required("Minimum band score is required")
+        .min(0),
+    })
+  ),
 
   careerOpportunities: Yup.array()
     .of(Yup.string()),

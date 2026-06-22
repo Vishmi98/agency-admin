@@ -4,40 +4,55 @@ import { CreateUniversityResponseDataType, CreateUniversityResponseType, CreateW
 
 import { URL } from "@/constants/config";
 import apiCall from "@/services/api.services";
+import { encryptData } from "@/lib/encrypt";
+import { decryptData } from "@/lib/decrypt";
 
 
 export const getUniversityData = async (page: number, limit?: number): Promise<UniversityResponseDataType> => {
+    const encryptedPayload = encryptData({
+        page,
+        limit: limit || 5,
+    });
+
     const response: UniversityResponseType = await apiCall({
         url: `${URL}/university/get-all`,
         method: 'POST',
-        body: { page, limit: limit || 5 },
+        body: {
+            payload: encryptedPayload,
+        },
     });
 
-    const data = response.data || {};
+    const decryptedData = decryptData(response.data);
 
     return {
-        success: response.success ?? false,
-        message: response.message || 'No message provided',
-        universities: data.universities || [],
-        page: data.page ?? 1,
-        limit: data.limit ?? 5,
-        totalPages: data.totalPages ?? 0,
-        totalUniversities: data.totalUniversities ?? 0,
+        success: response.success,
+        message: response.message,
+        universities: decryptedData.universities,
+        page: decryptedData.page,
+        limit: decryptedData.limit,
+        totalPages: decryptedData.totalPages,
+        totalUniversities: decryptedData.totalUniversities,
     };
 };
 
 export const createUniversity = async (body: UniversityType): Promise<CreateUniversityResponseDataType> => {
+    const encryptedPayload = encryptData(body);
+
     const response: CreateUniversityResponseType = await apiCall({
         url: `${URL}/university/create`,
         method: 'POST',
-        body: body,
+        body: {
+            payload: encryptedPayload,
+        },
     });
+
+    const decryptedData = decryptData(response.data || "");
 
     return {
         success: response.success,
         message: response.message,
         data: {
-            university: response.data,
+            university: decryptedData.university,
         },
     };
 };
@@ -91,16 +106,16 @@ export const getFilterUniversityReports = async (
         },
     });
 
-    const data = response.data || {};
+    const decryptedData = decryptData(response.data);
 
     return {
-        success: response.success ?? false,
-        message: response.message || 'No message provided',
-        universities: data.universities || [],
-        page: data.page ?? 1,
-        limit: data.limit ?? 5,
-        totalPages: data.totalPages ?? 0,
-        totalUniversities: data.totalUniversities ?? 0,
+        success: response.success,
+        message: response.message,
+        universities: decryptedData.universities,
+        page: decryptedData.page,
+        limit: decryptedData.limit,
+        totalPages: decryptedData.totalPages,
+        totalUniversities: decryptedData.totalUniversities,
     };
 };
 

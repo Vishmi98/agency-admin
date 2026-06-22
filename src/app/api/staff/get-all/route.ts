@@ -6,6 +6,8 @@ import TitleModel from "@/models/common/title.model";
 import StaffModel from "@/models/office/staff.model";
 import { sendErrorResponse, sendSuccessResponse } from "@/services/apiResponse";
 import { authenticate } from "@/lib/authenticate";
+import { decryptData } from "@/lib/decrypt";
+import { encryptData } from "@/lib/encrypt";
 
 
 export async function POST(req: NextRequest) {
@@ -13,22 +15,18 @@ export async function POST(req: NextRequest) {
     const authResult = await authenticate(req);
     if (authResult instanceof Response) return authResult; // Stop if auth failed
 
-    // authResult is AuthUser if valid
-    const user = authResult
-
     try {
         await connectDB();
 
-        const body = await req.json().catch(() => ({}));
+        const body = await req.json();
+
+        const decryptedBody = decryptData(body.payload || "");
+
         const {
             page = 1,
             limit = 10,
-            search = '',
-        }: {
-            page?: number;
-            limit?: number;
-            search?: string;
-        } = body;
+            search = "",
+        } = decryptedBody;
 
         const skip = (page - 1) * limit;
         const queryFilters: any = {};
@@ -74,13 +72,17 @@ export async function POST(req: NextRequest) {
 
         const totalStaffs = await StaffModel.countDocuments(queryFilters);
 
-        return sendSuccessResponse("Staffs retrieved successfully", {
+        const encryptedResponse = encryptData({
+            staffs,
             page,
             limit,
-            totalPages: Math.ceil(totalStaffs / limit),
-            totalStaffs,
-            staffs,
+            totalPages: Math.ceil(
+                totalStaffs / limit
+            ),
+            totalStaffs
         });
+
+        return sendSuccessResponse("OK", encryptedResponse);
     } catch (error) {
         return sendErrorResponse("Server error", 200);
     }

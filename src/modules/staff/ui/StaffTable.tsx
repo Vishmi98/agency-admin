@@ -132,7 +132,7 @@ const StaffTable: React.FC<StaffTableProps> = ({
       const response = await addStaffPassword(selectedStaffId, passwordInput);
 
       if (response.success) {
-        toast.success("Password updated successfully");
+        toast.success(response.message);
         handleClosePasswordModal();
       } else {
         toast.error(response.message);

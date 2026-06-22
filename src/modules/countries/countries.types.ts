@@ -10,7 +10,7 @@ export type AddModalProps = {
 export type CountriesResponseType = {
     success: boolean;
     message: string;
-    data: { countries: DropdownType[] | [] };
+    data: string;
 }
 
 export type CountriesResponseDataType = {
@@ -30,7 +30,7 @@ export type CreateCountryResponseDataType = {
 export type CreateCountryResponseType = {
     success: boolean;
     message: string;
-    data: DropdownType;
+    data: string;
 }
 
 export type TableProps = {

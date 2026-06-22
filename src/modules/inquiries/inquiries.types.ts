@@ -25,13 +25,7 @@ export type InquiriesResponseDataType = {
 export type InquiriesResponseType = {
     success: boolean;
     message: string;
-    data: {
-        page: number;
-        limit: number;
-        totalPages: number;
-        totalInquiries: number;
-        inquiries: InquiryDataType[];
-    }
+    data: string;
 }
 
 export type InquiryPageStateType = {

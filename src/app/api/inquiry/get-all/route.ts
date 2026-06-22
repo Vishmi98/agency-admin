@@ -4,6 +4,8 @@ import { connectDB } from "@/lib/mongodb";
 import { authenticate } from "@/lib/authenticate";
 import { sendErrorResponse, sendSuccessResponse } from "@/services/apiResponse";
 import InquiryModel from "@/models/common/inquiry.model";
+import { decryptData } from "@/lib/decrypt";
+import { encryptData } from "@/lib/encrypt";
 
 export async function POST(req: NextRequest) {
     const auth = await authenticate(req);
@@ -12,17 +14,15 @@ export async function POST(req: NextRequest) {
     try {
         await connectDB();
 
-        const body = await req.json().catch(() => ({}));
+        const body = await req.json();
+
+        const decryptedBody = decryptData(body.payload || "");
 
         const {
             page = 1,
             limit = 10,
             search = "",
-        }: {
-            page?: number;
-            limit?: number;
-            search?: string;
-        } = body;
+        } = decryptedBody;
 
         const skip = (page - 1) * limit;
 
@@ -33,13 +33,17 @@ export async function POST(req: NextRequest) {
 
         const totalInquiries = await InquiryModel.countDocuments();
 
-        return sendSuccessResponse("Inquiries fetched", {
+        const encryptedResponse = encryptData({
+            inquiries,
             page,
             limit,
-            totalPages: Math.ceil(totalInquiries / limit),
-            totalInquiries,
-            inquiries,
+            totalPages: Math.ceil(
+                totalInquiries / limit
+            ),
+            totalInquiries
         });
+
+        return sendSuccessResponse("OK", encryptedResponse);
     } catch (error) {
         return sendErrorResponse("Server error", 500);
     }

@@ -4,6 +4,8 @@ import { connectDB } from "@/lib/mongodb";
 import { sendErrorResponse, sendSuccessResponse } from "@/services/apiResponse";
 import { authenticate } from "@/lib/authenticate";
 import StaffModel from "@/models/office/staff.model";
+import { decryptData } from "@/lib/decrypt";
+import { encryptData } from "@/lib/encrypt";
 
 
 export async function POST(req: NextRequest) {
@@ -11,14 +13,13 @@ export async function POST(req: NextRequest) {
     const authResult = await authenticate(req);
     if (authResult instanceof Response) return authResult; // Stop if auth failed
 
-    // authResult is AuthUser if valid
-    const user = authResult
-
     try {
         await connectDB();
 
         const body = await req.json();
-        const { id, ...updatedData } = body;
+        const decryptedBody = decryptData(body.payload || body);
+
+        const { id, ...updatedData } = decryptedBody;
 
         if (typeof id !== "number") {
             return sendErrorResponse("Invalid or missing staff ID", 200);
@@ -34,7 +35,11 @@ export async function POST(req: NextRequest) {
             return sendErrorResponse("Staff not found", 200);
         }
 
-        return sendSuccessResponse("Staff updated successfully", { staff: updatedStaff });
+        const encryptedResponse = encryptData({
+            staff: updatedStaff
+        });
+
+        return sendSuccessResponse("Staff updated successfully", encryptedResponse);
     } catch (error) {
         return sendErrorResponse("Server error", 200);
     }

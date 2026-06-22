@@ -14,7 +14,6 @@ import {
 } from "@mui/material";
 import { Formik, Form, Field, ErrorMessage, FormikProps } from "formik";
 import { toast, ToastContainer } from "react-toastify";
-import 'react-toastify/dist/ReactToastify.css';
 import CloseIcon from '@mui/icons-material/Close';
 
 import { UniversityType } from "../university.types";

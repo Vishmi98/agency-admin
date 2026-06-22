@@ -14,6 +14,8 @@ import StaffModel from "@/models/office/staff.model";
 import LeadModel from "@/models/office/lead.model";
 import { StudentModel } from "@/models/student/student.model";
 import CourseModel from "@/models/university/course.model";
+import { decryptData } from "@/lib/decrypt";
+import { encryptData } from "@/lib/encrypt";
 
 export async function POST(req: NextRequest) {
     // AUTH
@@ -23,17 +25,15 @@ export async function POST(req: NextRequest) {
     try {
         await connectDB();
 
-        const body = await req.json().catch(() => ({}));
+        const body = await req.json();
+
+        const decryptedBody = decryptData(body.payload || "");
 
         const {
             page = 1,
             limit = 10,
             search = "",
-        }: {
-            page?: number;
-            limit?: number;
-            search?: string;
-        } = body;
+        } = decryptedBody;
 
         const skip = (page - 1) * limit;
 
@@ -147,18 +147,17 @@ export async function POST(req: NextRequest) {
             queryFilters
         );
 
-        return sendSuccessResponse(
-            "Leads retrieved successfully",
-            {
-                page,
-                limit,
-                totalPages: Math.ceil(
-                    totalLeads / limit
-                ),
-                totalLeads,
-                leads,
-            }
-        );
+        const encryptedResponse = encryptData({
+            leads,
+            page,
+            limit,
+            totalPages: Math.ceil(
+                totalLeads / limit
+            ),
+            totalLeads
+        });
+
+        return sendSuccessResponse("OK", encryptedResponse);
     } catch (error) {
         console.error("Lead Fetch Error:", error);
         return sendErrorResponse(

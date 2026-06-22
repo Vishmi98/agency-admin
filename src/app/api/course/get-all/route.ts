@@ -6,6 +6,8 @@ import { sendErrorResponse, sendSuccessResponse } from "@/services/apiResponse";
 import UniversityModel from "@/models/university/university.model";
 import CourseModel from "@/models/university/course.model";
 import "@/models/common/country.model";
+import { decryptData } from "@/lib/decrypt";
+import { encryptData } from "@/lib/encrypt";
 
 export async function POST(req: NextRequest) {
     // AUTH
@@ -15,17 +17,15 @@ export async function POST(req: NextRequest) {
     try {
         await connectDB();
 
-        const body = await req.json().catch(() => ({}));
+        const body = await req.json();
+
+        const decryptedBody = decryptData(body.payload || "");
 
         const {
             page = 1,
             limit = 10,
             search = "",
-        }: {
-            page?: number;
-            limit?: number;
-            search?: string;
-        } = body;
+        } = decryptedBody;
 
         const skip = (page - 1) * limit;
 
@@ -128,18 +128,17 @@ export async function POST(req: NextRequest) {
             queryFilters
         );
 
-        return sendSuccessResponse(
-            "Courses retrieved successfully",
-            {
-                page,
-                limit,
-                totalPages: Math.ceil(
-                    totalCourses / limit
-                ),
-                totalCourses,
-                courses,
-            }
-        );
+        const encryptedResponse = encryptData({
+            courses,
+            page,
+            limit,
+            totalPages: Math.ceil(
+                totalCourses / limit
+            ),
+            totalCourses
+        });
+
+        return sendSuccessResponse("OK", encryptedResponse);
     } catch (error) {
         console.error("Get Courses Error:", error);
         return sendErrorResponse("Server error", 200);

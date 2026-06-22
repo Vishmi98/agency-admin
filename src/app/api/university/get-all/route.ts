@@ -6,6 +6,8 @@ import "@/models/office/staff.model";
 import { sendErrorResponse, sendSuccessResponse } from "@/services/apiResponse";
 import UniversityModel from "@/models/university/university.model";
 import { authenticate } from "@/lib/authenticate";
+import { decryptData } from "@/lib/decrypt";
+import { encryptData } from "@/lib/encrypt";
 
 
 export async function POST(req: NextRequest) {
@@ -13,20 +15,17 @@ export async function POST(req: NextRequest) {
     const authResult = await authenticate(req);
     if (authResult instanceof Response) return authResult; // Stop if auth failed
 
-    // authResult is AuthUser if valid
-    const user = authResult
-
     try {
         await connectDB();
 
-        const body = await req.json().catch(() => ({}));
+        const body = await req.json();
+
+        const decryptedBody = decryptData(body.payload || "");
+
         const {
             page = 1,
             limit = 10,
-        }: {
-            page?: number;
-            limit?: number;
-        } = body;
+        } = decryptedBody;
 
         const skip = (page - 1) * limit;
 
@@ -44,13 +43,17 @@ export async function POST(req: NextRequest) {
 
         const totalUniversities = await UniversityModel.countDocuments();
 
-        return sendSuccessResponse("Universities retrieved successfully", {
+        const encryptedResponse = encryptData({
+            universities,
             page,
             limit,
-            totalPages: Math.ceil(totalUniversities / limit),
-            totalUniversities,
-            universities,
+            totalPages: Math.ceil(
+                totalUniversities / limit
+            ),
+            totalUniversities
         });
+
+        return sendSuccessResponse("OK", encryptedResponse);
     } catch (error) {
         return sendErrorResponse("Server error", 200);
     }

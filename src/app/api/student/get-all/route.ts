@@ -8,6 +8,8 @@ import VistaStatusModel from "@/models/common/visaStatus.model";
 import BranchModel from "@/models/common/branch.model";
 import { StudentModel } from "@/models/student/student.model";
 import { authenticate } from "@/lib/authenticate";
+import { decryptData } from "@/lib/decrypt";
+import { encryptData } from "@/lib/encrypt";
 
 
 export async function POST(req: NextRequest) {
@@ -15,22 +17,19 @@ export async function POST(req: NextRequest) {
     const authResult = await authenticate(req);
     if (authResult instanceof Response) return authResult; // Stop if auth failed
 
-    // authResult is AuthUser if valid
-    const user = authResult
-
     try {
         await connectDB();
 
-        const body = await req.json().catch(() => ({}));
+        const body = await req.json();
+
+        const decryptedBody = decryptData(body.payload || "");
+
         const {
             page = 1,
             limit = 10,
-            search = '',
-        }: {
-            page?: number;
-            limit?: number;
-            search?: string;
-        } = body;
+            search = "",
+        } = decryptedBody;
+
 
         const skip = (page - 1) * limit;
         const queryFilters: any = {};
@@ -141,13 +140,17 @@ export async function POST(req: NextRequest) {
 
         const totalStudents = await StudentModel.countDocuments(queryFilters);
 
-        return sendSuccessResponse("Students retrieved successfully", {
+        const encryptedResponse = encryptData({
+            students,
             page,
             limit,
-            totalPages: Math.ceil(totalStudents / limit),
-            totalStudents,
-            students,
+            totalPages: Math.ceil(
+                totalStudents / limit
+            ),
+            totalStudents
         });
+
+        return sendSuccessResponse("OK", encryptedResponse);
     } catch (error) {
         return sendErrorResponse("Server error", 200);
     }

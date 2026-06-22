@@ -15,7 +15,6 @@ import {
 } from "@mui/material";
 import { Formik, Form, FormikProps } from "formik";
 import { toast, ToastContainer } from "react-toastify";
-import 'react-toastify/dist/ReactToastify.css';
 import CloseIcon from '@mui/icons-material/Close';
 
 import { AddModalProps } from "../countries.types";

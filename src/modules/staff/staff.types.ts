@@ -4,7 +4,7 @@ import { DropdownType } from "@/type/common.types";
 export type TitlesResponseType = {
     success: boolean;
     message: string;
-    data: { titles: DropdownType[] | [] };
+    data: string;
 }
 
 export type TitlesResponseDataType = {
@@ -16,7 +16,7 @@ export type TitlesResponseDataType = {
 export type GendersResponseType = {
     success: boolean;
     message: string;
-    data: { genders: DropdownType[] | [] };
+    data: string;
 }
 
 export type GendersResponseDataType = {
@@ -28,7 +28,7 @@ export type GendersResponseDataType = {
 export type BranchesResponseType = {
     success: boolean;
     message: string;
-    data: { branches: DropdownType[] | [] };
+    data: string;
 }
 
 export type BranchesResponseDataType = {
@@ -115,13 +115,7 @@ export type StaffResponseDataType = {
 export type StaffResponseType = {
     success: boolean;
     message: string;
-    data: {
-        page: number;
-        limit: number;
-        totalPages: number;
-        totalStaffs: number;
-        staffs: StaffDataType[];
-    }
+    data: string;
 }
 
 export type StaffSearchProps = {
@@ -226,7 +220,7 @@ export type StaffTableProps = {
 export type UpdateAttendanceMatterStatusResponseDataType = {
     success: boolean;
     message: string;
-    data: StaffType
+    data: string;
 }
 
 export type StaffWithoutSalaryResponseDataType = {
@@ -256,7 +250,7 @@ export type StaffWithoutSalaryResponseType = {
 export type CreateStaffResponseType = {
     success: boolean;
     message: string;
-    data: StaffType;
+    data: string;
 }
 
 export type CreateStaffResponseDataType = {
@@ -285,5 +279,5 @@ export type UpdateStaffResponseDataType = {
 export type UpdateStaffResponseType = {
     success: boolean;
     message: string;
-    data: StaffType;
+    data: string;
 }

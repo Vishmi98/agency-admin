@@ -75,19 +75,13 @@ export type UniversityResponseDataType = {
 export type UniversityResponseType = {
     success: boolean;
     message: string;
-    data: {
-        page: number;
-        limit: number;
-        totalPages: number;
-        totalUniversities: number;
-        universities: UniversityDataType[];
-    }
+    data: string;
 }
 
 export type CreateUniversityResponseType = {
     success: boolean;
     message: string;
-    data: UniversityType;
+    data: string;
 }
 
 export type CreateUniversityResponseDataType = {

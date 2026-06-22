@@ -46,19 +46,13 @@ export type LeadsResponseDataType = {
 export type LeadsResponseType = {
     success: boolean;
     message: string;
-    data: {
-        page: number;
-        limit: number;
-        totalPages: number;
-        totalLeads: number;
-        leads: LeadDataType[];
-    }
+    data: string;
 }
 
 export type CreateLeadResponseType = {
     success: boolean;
     message: string;
-    data: LeadType;
+    data: string;
 }
 
 export type CreateLeadResponseDataType = {

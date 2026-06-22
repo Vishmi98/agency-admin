@@ -1,9 +1,11 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 
 import { connectDB } from "@/lib/mongodb";
 import { sendErrorResponse, sendSuccessResponse } from "@/services/apiResponse";
 import { StudentModel } from "@/models/student/student.model";
 import { authenticate } from "@/lib/authenticate";
+import { decryptData } from "@/lib/decrypt";
+import { encryptData } from "@/lib/encrypt";
 
 
 export async function POST(req: NextRequest) {
@@ -18,7 +20,9 @@ export async function POST(req: NextRequest) {
         await connectDB();
 
         const body = await req.json();
-        const { id, ...updatedData } = body;
+        const decryptedBody = decryptData(body.payload || body);
+
+        const { id, ...updatedData } = decryptedBody;
 
         if (typeof id !== "number") {
             return sendErrorResponse("Invalid or missing student ID", 200);
@@ -34,7 +38,11 @@ export async function POST(req: NextRequest) {
             return sendErrorResponse("Student not found", 200);
         }
 
-        return sendSuccessResponse("Student updated successfully", { student: updatedStudent });
+        const encryptedResponse = encryptData({
+            student: updatedStudent
+        });
+
+        return sendSuccessResponse("Student updated successfully", encryptedResponse);
     } catch (error) {
         return sendErrorResponse("Server error", 200);
     }

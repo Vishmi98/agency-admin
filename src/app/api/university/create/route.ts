@@ -4,6 +4,8 @@ import { connectDB } from "@/lib/mongodb";
 import { sendErrorResponse, sendSuccessResponse } from "@/services/apiResponse";
 import UniversityModel from "@/models/university/university.model";
 import { authenticate } from "@/lib/authenticate";
+import { decryptData } from "@/lib/decrypt";
+import { encryptData } from "@/lib/encrypt";
 
 
 export async function POST(req: NextRequest) {
@@ -11,13 +13,15 @@ export async function POST(req: NextRequest) {
     const authResult = await authenticate(req);
     if (authResult instanceof Response) return authResult; // Stop if auth failed
 
-    // authResult is AuthUser if valid
-    const user = authResult
-
     try {
         await connectDB();
 
         const body = await req.json();
+
+        const decryptedBody = decryptData(
+            body.payload
+        );
+
         const {
             name,
             address,
@@ -27,7 +31,7 @@ export async function POST(req: NextRequest) {
             staffId,
             rank,
             code,
-        } = body;
+        } = decryptedBody;
 
         if (!name || !address || !countryId || !phoneNumber || !staffId || !rank || !code) {
             return sendErrorResponse("Missing required fields", 200);
@@ -61,7 +65,14 @@ export async function POST(req: NextRequest) {
             createdDate: new Date()
         });
 
-        return sendSuccessResponse("University created successfully", { university });
+        const encryptedResponse = encryptData({
+            university,
+        });
+
+        return sendSuccessResponse(
+            "University created successfully!",
+            encryptedResponse
+        );
     } catch (error) {
         return sendErrorResponse("Server error", 200);
     }

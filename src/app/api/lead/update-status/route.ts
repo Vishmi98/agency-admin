@@ -4,6 +4,7 @@ import { connectDB } from "@/lib/mongodb";
 import { authenticate } from "@/lib/authenticate";
 import { sendErrorResponse, sendSuccessResponse } from "@/services/apiResponse";
 import LeadModel from "@/models/office/lead.model";
+import { decryptData } from "@/lib/decrypt";
 
 
 export async function POST(req: NextRequest) {
@@ -14,7 +15,9 @@ export async function POST(req: NextRequest) {
     try {
         await connectDB();
 
-        const body = await req.json().catch(() => ({}));
+        const body = await req.json();
+
+        const decryptedBody = decryptData(body.payload || "");
 
         const {
             leadId,
@@ -22,7 +25,7 @@ export async function POST(req: NextRequest) {
         }: {
             leadId: number;
             status: number;
-        } = body;
+        } = decryptedBody;
 
         // Validation
         if (!leadId || !status) {

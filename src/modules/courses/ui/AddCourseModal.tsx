@@ -15,7 +15,7 @@ import {
     Typography,
     useTheme,
 } from "@mui/material";
-import { Formik, Form, FormikProps, Field, ErrorMessage } from "formik";
+import { Formik, Form, FormikProps, Field, ErrorMessage, FieldArray } from "formik";
 import { toast, ToastContainer } from "react-toastify";
 import CloseIcon from '@mui/icons-material/Close';
 
@@ -115,7 +115,7 @@ const AddCourseModal: FC<AddModalProps> = ({ isOpen, onClose, handleReload }) =>
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                     />
-                    <Box sx={{ alignItems: "center", justifyContent: "center", mt: 0.5}}>
+                    <Box sx={{ alignItems: "center", justifyContent: "center", mt: 0.5 }}>
                         <Button
                             variant="contained"
                             onClick={handleAdd}
@@ -283,6 +283,7 @@ const AddCourseModal: FC<AddModalProps> = ({ isOpen, onClose, handleReload }) =>
                                             )}
                                         />
                                     </Grid>
+
                                     <Grid item xs={12} md={6}>
                                         <Typography fontSize="12px">Credits</Typography>
                                         <TextBox
@@ -295,6 +296,7 @@ const AddCourseModal: FC<AddModalProps> = ({ isOpen, onClose, handleReload }) =>
                                             helperText={touched.credits && errors.credits}
                                         />
                                     </Grid>
+
                                     <Grid item xs={12} md={6}>
                                         <Typography fontSize="12px">Duration</Typography>
                                         <TextBox
@@ -319,44 +321,116 @@ const AddCourseModal: FC<AddModalProps> = ({ isOpen, onClose, handleReload }) =>
                                             fullWidth
                                         />
                                     </Grid>
+
                                     <Grid item xs={12}>
                                         <Typography
                                             fontWeight={600}
-                                            sx={{ my: 1 }}
+                                            sx={{ mt: 1 }}
                                         >
                                             English Requirement
                                         </Typography>
                                     </Grid>
+                                    <Grid item xs={12}>
+                                        <FieldArray name="englishRequirement">
+                                            {({ push, remove }) => (
+                                                <Box
+                                                    sx={{
+                                                        border: "1px solid #ddd",
+                                                        borderRadius: 2,
+                                                        p: 2,
+                                                        mt: 1,
+                                                    }}
+                                                >
+                                                    {values.englishRequirement.map((req, index) => (
+                                                        <Grid
+                                                            container
+                                                            spacing={2}
+                                                            key={index}
+                                                            alignItems="center"
+                                                            sx={{ mb: 2 }}
+                                                        >
+                                                            <Grid item xs={12} md={4}>
+                                                                <TextBox
+                                                                    name={`englishRequirement[${index}].test`}
+                                                                    label="Test"
+                                                                    as="input"
+                                                                    type="text"
+                                                                    fullWidth
+                                                                />
+                                                            </Grid>
 
-                                    <Grid item xs={12} md={4}>
-                                        <TextBox
-                                            name="englishRequirement.test"
-                                            label="Test"
-                                            as="input"
-                                            type="text"
-                                            fullWidth
-                                        />
+                                                            <Grid item xs={12} md={3}>
+                                                                <TextBox
+                                                                    name={`englishRequirement[${index}].overallScore`}
+                                                                    label="Overall Score"
+                                                                    as="input"
+                                                                    type="number"
+                                                                    fullWidth
+                                                                />
+                                                            </Grid>
+
+                                                            <Grid item xs={12} md={3}>
+                                                                <TextBox
+                                                                    name={`englishRequirement[${index}].minimumBand`}
+                                                                    label="Minimum Band"
+                                                                    as="input"
+                                                                    type="number"
+                                                                    fullWidth
+                                                                />
+                                                            </Grid>
+
+                                                            <Grid
+                                                                item
+                                                                xs={12}
+                                                                md={2}
+                                                                sx={{
+                                                                    display: "flex",
+                                                                    justifyContent: "center",
+                                                                    alignItems: "center",
+                                                                }}
+                                                            >
+                                                                {values.englishRequirement.length > 1 && (
+                                                                    <Button
+                                                                        variant="outlined"
+                                                                        color="error"
+                                                                        size="small"
+                                                                        onClick={() => remove(index)}
+                                                                        sx={{ fontSize: "12px" }}
+                                                                    >
+                                                                        Remove
+                                                                    </Button>
+                                                                )}
+                                                            </Grid>
+                                                        </Grid>
+                                                    ))}
+
+                                                    <Box
+                                                        sx={{
+                                                            display: "flex",
+                                                            justifyContent: "flex-start",
+                                                            mt: 1,
+                                                        }}
+                                                    >
+                                                        <Button
+                                                            variant="contained"
+                                                            size="small"
+                                                            sx={{ fontSize: "12px" }}
+                                                            onClick={() =>
+                                                                push({
+                                                                    test: "",
+                                                                    overallScore: 0,
+                                                                    minimumBand: 0,
+                                                                })
+                                                            }
+                                                        >
+                                                            Add
+                                                        </Button>
+                                                    </Box>
+                                                </Box>
+                                            )}
+                                        </FieldArray>
                                     </Grid>
 
-                                    <Grid item xs={12} md={4}>
-                                        <TextBox
-                                            name="englishRequirement.overallScore"
-                                            label="Overall Score"
-                                            as="input"
-                                            type="number"
-                                            fullWidth
-                                        />
-                                    </Grid>
-
-                                    <Grid item xs={12} md={4}>
-                                        <TextBox
-                                            name="englishRequirement.minimumBand"
-                                            label="Minimum Band"
-                                            as="input"
-                                            type="number"
-                                            fullWidth
-                                        />
-                                    </Grid>
                                     <Grid item xs={12} md={6}>
                                         <Typography fontSize="12px">
                                             Tuition Fee

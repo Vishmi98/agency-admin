@@ -71,7 +71,7 @@ const Student: React.FC<StudentProp> = ({ student, setIsModalOpen }) => {
                         marginBottom: 3
                     }}>
                         <img
-                            src="/logo1.jpeg"
+                            src="/logo1.png"
                             alt="Real Smart Logo"
                             width={160}
                             height={90}
@@ -84,11 +84,11 @@ const Student: React.FC<StudentProp> = ({ student, setIsModalOpen }) => {
                             justifyContent: "flex-end"
                         }}>
                             <Box>
-                                <Typography variant="body2" align="right" fontWeight="bold">Real Smart Global Pvt Ltd</Typography>
-                                <Typography variant="body2" align="right">176/1 Nawala road</Typography>
-                                <Typography variant="body2" align="right">Nugegoda</Typography>
-                                <Typography variant="body2" align="right">Sri Lanka</Typography>
-                                <Typography variant="body2" align="right">marketingrealsmart@gmail.com</Typography>
+                                <Typography variant="body2" align="right" fontWeight="bold">xxx xxx xxx xxx</Typography>
+                                <Typography variant="body2" align="right">xxx xxx xxx</Typography>
+                                <Typography variant="body2" align="right">xxx</Typography>
+                                <Typography variant="body2" align="right">xxx</Typography>
+                                <Typography variant="body2" align="right">xxx@gmail.com</Typography>
                             </Box>
                         </Box>
                     </Box>

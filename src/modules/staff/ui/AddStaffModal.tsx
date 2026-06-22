@@ -14,7 +14,6 @@ import {
 } from "@mui/material";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import { toast, ToastContainer } from "react-toastify";
-import 'react-toastify/dist/ReactToastify.css';
 import CloseIcon from '@mui/icons-material/Close';
 
 import { StaffType } from "../staff.types";
@@ -255,7 +254,7 @@ const AddStaffModal: FC<AddModalProps> = ({ isOpen, onClose, handleReload }) => 
                                         </Field>
                                         <ErrorMessage name="branchId" component="div" className="text-red-400 text-xs pl-1" />
                                     </Grid>
-                                    <Grid item xs={12} md={6}>
+                                    <Grid item xs={6}>
                                         <Typography fontSize="12px">Roll</Typography>
                                         <Field
                                             as="select"

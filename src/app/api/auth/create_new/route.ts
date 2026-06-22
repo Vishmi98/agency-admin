@@ -3,6 +3,8 @@ import { NextRequest } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import { sendErrorResponse, sendSuccessResponse } from "@/services/apiResponse";
 import { StudentModel } from "@/models/student/student.model";
+import { decryptData } from "@/lib/decrypt";
+import { encryptData } from "@/lib/encrypt";
 
 
 export async function POST(req: NextRequest) {
@@ -11,6 +13,11 @@ export async function POST(req: NextRequest) {
         await connectDB();
 
         const body = await req.json();
+
+        const decryptedBody = decryptData(
+            body.payload
+        );
+
         const {
             title,
             firstName,
@@ -30,7 +37,7 @@ export async function POST(req: NextRequest) {
             status,
             visaStatus,
             branchId,
-        } = body;
+        } = decryptedBody;
 
         if (
             !title || !firstName || !lastName || !fullName ||
@@ -77,7 +84,12 @@ export async function POST(req: NextRequest) {
             updatedDate: new Date()
         });
 
-        return sendSuccessResponse("Student created successfully", { student: newStudent });
+        // 🔥 ENCRYPT RESPONSE (important)
+        const encryptedResponse = encryptData({
+            student: newStudent
+        });
+
+        return sendSuccessResponse("Student created successfully", encryptedResponse);
     } catch (error) {
         return sendErrorResponse("Server error", 200);
     }

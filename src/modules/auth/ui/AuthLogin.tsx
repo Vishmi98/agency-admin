@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import { Box, Button, Stack, Typography, TextField, IconButton } from "@mui/material";
 import { toast, ToastContainer } from "react-toastify";
-import 'react-toastify/dist/ReactToastify.css';
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 
@@ -17,6 +16,7 @@ import { LOCAL_STORE } from "@/constants/key";
 import { REDIRECT_ROUTE } from "@/constants/data";
 import { UserStoreUserType } from "@/type/common.types";
 import { handleSaveCookieToken, handleSaveCookieUser } from "@/utils/cookie.util";
+import { LoginFormType } from "../authForm.types";
 
 
 const AuthLogin = () => {
@@ -24,10 +24,10 @@ const AuthLogin = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleSubmit = async (values: any, { resetForm }: { resetForm: () => void }) => {
+  const handleSubmit = async (values: LoginFormType, { resetForm }: { resetForm: () => void }) => {
     try {
       setIsLoading(true)
-      const res = await handleUserLogin({ email: values.email, password: values.password });
+      const res = await handleUserLogin(values);
       if (res.success && res?.token) {
         localStorage.setItem(LOCAL_STORE.LOCAL_USER, res?.token);
         const decoded = jwt.decode(res?.token) as { user: UserStoreUserType };

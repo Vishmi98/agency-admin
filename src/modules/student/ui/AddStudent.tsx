@@ -5,7 +5,6 @@ import {
     Box,
     Button,
     DialogActions,
-    DialogContent,
     Typography,
     Grid,
     useTheme,
@@ -22,8 +21,7 @@ import { createStudent, getVisaStatuses } from "../services/student.services";
 
 import TextBox from "@/components/TextBox";
 import { DropdownType } from "@/type/common.types";
-import { getStaffData, getTitles } from "@/modules/staff/services/staff.services";
-import { Branches } from "@/constants/data";
+import { getBranches, getStaffData, getTitles } from "@/modules/staff/services/staff.services";
 import { StaffDataType } from "@/modules/staff/staff.types";
 
 
@@ -36,18 +34,21 @@ const AddStudent = () => {
     const [visaStatuses, setVisaStatuses] = useState<DropdownType[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [staffs, setStaffs] = useState<StaffDataType[]>([]);
+    const [branches, setBranches] = useState<DropdownType[]>([]);
 
     const fetchDropdownData = async () => {
         try {
-            const [titlesData, visaStatusesData, staffsRes] = await Promise.all([
+            const [titlesData, visaStatusesData, staffsRes, branchesRes] = await Promise.all([
                 getTitles(),
                 getVisaStatuses(),
-                getStaffData(1, 100)
+                getStaffData(1, 100),
+                getBranches()
             ]);
 
             setTitles(titlesData.success ? titlesData.titles : []);
             setVisaStatuses(visaStatusesData.success ? visaStatusesData.visaStatusTypes : []);
             setStaffs(staffsRes.success ? staffsRes.staffs : []);
+            setBranches(branchesRes.success ? branchesRes.branches : [])
 
         } catch (error) {
             console.log("Error fetching dropdown data", error);
@@ -227,9 +228,9 @@ const AddStudent = () => {
                                         }}
                                     >
                                         <option value="">Select</option>
-                                        {Branches.map((branch) => (
+                                        {branches.map((branch) => (
                                             <option key={branch.id} value={branch.id}>
-                                                {branch.location}
+                                                {branch?.title?.EN}
                                             </option>
                                         ))}
                                     </Field>

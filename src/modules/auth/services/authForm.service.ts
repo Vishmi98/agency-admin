@@ -2,13 +2,18 @@ import { LoginFormType, LoginResponseType, UserLoginResponseType } from "../auth
 
 import apiCall from "@/services/api.services";
 import { URL } from "@/constants/config";
+import { encryptData } from "@/lib/encrypt";
 
 
-export const handleUserLogin = async ({ email, password }: LoginFormType): Promise<UserLoginResponseType> => {
+export const handleUserLogin = async (body: LoginFormType): Promise<UserLoginResponseType> => {
+    const encryptedPayload = encryptData(body);
+
     const response: LoginResponseType = await apiCall({
         url: `${URL}/auth/login-staff`,
         method: 'POST',
-        body: { email, password },
+        body: {
+            payload: encryptedPayload,
+        },
         isAuth: false
     })
 

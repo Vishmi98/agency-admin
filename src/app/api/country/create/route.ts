@@ -4,6 +4,8 @@ import { connectDB } from "@/lib/mongodb";
 import { sendErrorResponse, sendSuccessResponse } from "@/services/apiResponse";
 import CountryModel from "@/models/common/country.model";
 import { authenticate } from "@/lib/authenticate";
+import { decryptData } from "@/lib/decrypt";
+import { encryptData } from "@/lib/encrypt";
 
 
 export async function POST(req: NextRequest) {
@@ -11,13 +13,15 @@ export async function POST(req: NextRequest) {
     const authResult = await authenticate(req);
     if (authResult instanceof Response) return authResult; // Stop if auth failed
 
-    // authResult is AuthUser if valid
-    const user = authResult
-
     try {
         await connectDB();
         const body = await req.json();
-        const { title } = body;
+
+        const decryptedBody = decryptData(
+            body.payload
+        );
+
+        const { title } = decryptedBody;
 
         if (!title?.SN || !title?.EN || !title?.TM) {
             return sendErrorResponse("Missing required fields in country", 200);
@@ -46,7 +50,14 @@ export async function POST(req: NextRequest) {
 
         const country = await CountryModel.create({ id, title });
 
-        return sendSuccessResponse("Country created successfully!", { country });
+        const encryptedResponse = encryptData({
+            country,
+        });
+
+        return sendSuccessResponse(
+            "Country created successfully!",
+            encryptedResponse
+        );
     } catch (error) {
         return sendErrorResponse("Server error", 200);
     }

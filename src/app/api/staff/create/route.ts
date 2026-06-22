@@ -7,6 +7,8 @@ import StaffModel from "@/models/office/staff.model";
 import { ERROR_MESSAGES } from "@/constants/messages";
 import { sendErrorResponse, sendSuccessResponse } from "@/services/apiResponse";
 import { authenticate } from "@/lib/authenticate";
+import { decryptData } from "@/lib/decrypt";
+import { encryptData } from "@/lib/encrypt";
 
 
 export async function POST(req: NextRequest) {
@@ -14,13 +16,15 @@ export async function POST(req: NextRequest) {
     const authResult = await authenticate(req);
     if (authResult instanceof Response) return authResult; // Stop if auth failed
 
-    // authResult is AuthUser if valid
-    const user = authResult
-
     try {
         await connectDB();
 
         const body = await req.json();
+
+        const decryptedBody = decryptData(
+            body.payload
+        );
+
         const {
             firstName,
             lastName,
@@ -33,7 +37,7 @@ export async function POST(req: NextRequest) {
             fullName,
             address,
             branchId,
-        } = body;
+        } = decryptedBody;
 
         const langHeader = req.headers.get("lb-lang");
         const selectedLanguage: Language =
@@ -51,7 +55,7 @@ export async function POST(req: NextRequest) {
             );
         }
 
-        await registerStaffService({
+        const newStaff = await registerStaffService({
             firstName,
             lastName,
             password,
@@ -65,7 +69,16 @@ export async function POST(req: NextRequest) {
             branchId,
         });
 
-        return sendSuccessResponse("Staff created successfully!");
+        // 🔥 ENCRYPT RESPONSE
+        const encryptedResponse = encryptData({
+            staff: newStaff,
+        });
+
+        return sendSuccessResponse(
+            "Staff created successfully!",
+            encryptedResponse
+        );
+
     } catch (error) {
         return sendErrorResponse("Server error", 200);
     }

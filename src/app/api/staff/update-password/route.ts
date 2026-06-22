@@ -6,6 +6,8 @@ import { connectDB } from "@/lib/mongodb";
 import { sendErrorResponse, sendSuccessResponse } from "@/services/apiResponse";
 import { authenticate } from "@/lib/authenticate";
 import StaffModel from "@/models/office/staff.model";
+import { decryptData } from "@/lib/decrypt";
+import { encryptData } from "@/lib/encrypt";
 
 export async function POST(req: NextRequest) {
     // 🔹 Authenticate first
@@ -19,7 +21,10 @@ export async function POST(req: NextRequest) {
         await connectDB();
 
         const body = await req.json();
-        const { id, newPassword } = body;
+
+        const decryptedBody = decryptData(body.payload || "");
+
+        const { id, newPassword } = decryptedBody;
 
         // Validate input
         if (typeof id !== "number") {
@@ -43,7 +48,14 @@ export async function POST(req: NextRequest) {
             return sendErrorResponse("Staff not found", 200);
         }
 
-        return sendSuccessResponse("Password updated successfully");
+        const encryptedResponse = encryptData({
+            staff: updatedStaff,
+        });
+
+        return sendSuccessResponse(
+            "Password updated successfully",
+            encryptedResponse
+        );
     } catch (error) {
         console.error(error);
         return sendErrorResponse("Server error", 200);

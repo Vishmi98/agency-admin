@@ -89,13 +89,7 @@ export type StudentsResponseDataType = {
 export type StudentsResponseType = {
     success: boolean;
     message: string;
-    data: {
-        page: number;
-        limit: number;
-        totalPages: number;
-        totalStudents: number;
-        students: StudentDataType[];
-    }
+    data: string;
 }
 
 export type StudentStatusResponseType = {
@@ -128,7 +122,7 @@ export type CreateStudentResponseDataType = {
 export type CreateStudentResponseType = {
     success: boolean;
     message: string;
-    data: StudentType;
+    data: string;
 }
 
 export type UpdateStudentResponseDataType = {
@@ -142,7 +136,7 @@ export type UpdateStudentResponseDataType = {
 export type UpdateStudentResponseType = {
     success: boolean;
     message: string;
-    data: StudentType;
+    data: string;
 }
 
 export type StudentSearchProps = {
@@ -200,7 +194,7 @@ export const studentPageReducer = (state: StudentPageStateType, action: { type: 
 export type VisaStatusResponseType = {
     success: boolean;
     message: string;
-    data: { visaStatusTypes: DropdownType[] | [] };
+    data: string;
 }
 
 export type VisaStatusResponseDataType = {
