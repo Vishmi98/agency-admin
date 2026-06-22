@@ -2,10 +2,12 @@
 
 import { useCallback, useEffect, useReducer } from 'react';
 import { Box, Typography, useTheme } from '@mui/material';
+import { useRouter } from 'next/navigation';
 
 import { inquiryPageInitialState, inquiryPageReducer, InquiryPageStateType } from '@/modules/inquiries/inquiries.types';
 import { getInquiriesData } from '@/modules/inquiries/inquiries.service';
 import InquiriesTable from '@/modules/inquiries/ui/InquiriesTable';
+import { getCookieUser } from '@/utils/cookie.util';
 
 
 const InquiriesPage = () => {
@@ -13,6 +15,14 @@ const InquiriesPage = () => {
 
     const [state, dispatch] = useReducer(inquiryPageReducer, inquiryPageInitialState);
     const { inquiries, isLoading, page, limit, totalRows, search } = state;
+    const user = getCookieUser()
+    const router = useRouter();
+
+    useEffect(() => {
+        if (!user) {
+            router.push('/');
+        }
+    }, [user, router]);
 
     const updateState = (value: Partial<InquiryPageStateType>) => {
         dispatch({ type: 'update', payload: value });

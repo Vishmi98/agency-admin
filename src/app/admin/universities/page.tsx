@@ -1,17 +1,27 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button, Box, Typography, useTheme } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
+import { useRouter } from 'next/navigation';
 
 import UniversitiesTable from '@/modules/university/ui/UniversitiesTable';
 import AddUniversityModal from '@/modules/university/ui/AddUniversityModal';
+import { getCookieUser } from '@/utils/cookie.util';
 
 
 const UniversitiesPage = () => {
     const [open, setOpen] = useState(false);
     const [reloadTable, setReloadTable] = useState(false);
     const theme = useTheme();
+    const user = getCookieUser()
+    const router = useRouter();
+
+    useEffect(() => {
+        if (!user) {
+            router.push('/');
+        }
+    }, [user, router]);
 
     const handleClickOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);

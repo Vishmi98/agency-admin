@@ -1,18 +1,28 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Box, Button, Typography } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import { useTheme } from '@mui/material/styles';
+import { useRouter } from 'next/navigation';
 
 import CountriesTable from '@/modules/countries/ui/Countries';
 import AddCountryModal from '@/modules/countries/ui/AddCountryModal';
+import { getCookieUser } from '@/utils/cookie.util';
 
 
 const CountriesPage = () => {
     const [open, setOpen] = useState(false);
     const [reloadTable, setReloadTable] = useState(false);
     const theme = useTheme();
+    const user = getCookieUser()
+    const router = useRouter();
+
+    useEffect(() => {
+        if (!user) {
+            router.push('/');
+        }
+    }, [user, router]);
 
     const handleClickOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);

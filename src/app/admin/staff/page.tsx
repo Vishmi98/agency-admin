@@ -3,12 +3,14 @@
 import { useCallback, useEffect, useReducer } from 'react';
 import { Box, Button, Typography, useTheme } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
+import { useRouter } from 'next/navigation';
 
 import StaffTable from '@/modules/staff/ui/StaffTable';
 import StaffSearch from '@/modules/staff/ui/StaffSearch';
 import { staffPageInitialState, staffPageReducer, StaffPageStateType } from '@/modules/staff/staff.types';
 import { getStaffData } from '@/modules/staff/services/staff.services';
 import AddStaffModal from '@/modules/staff/ui/AddStaffModal';
+import { getCookieUser } from '@/utils/cookie.util';
 
 
 const StaffPage = () => {
@@ -16,6 +18,14 @@ const StaffPage = () => {
 
     const [state, dispatch] = useReducer(staffPageReducer, staffPageInitialState);
     const { staffs, isLoading, page, selectedStaff, limit, totalRows, search, isOpen } = state;
+    const user = getCookieUser()
+    const router = useRouter();
+
+    useEffect(() => {
+        if (!user) {
+            router.push('/');
+        }
+    }, [user, router]);
 
     const updateState = (value: Partial<StaffPageStateType>) => {
         dispatch({ type: 'update', payload: value });

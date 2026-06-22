@@ -3,11 +3,13 @@
 import { useCallback, useEffect, useReducer } from 'react';
 import { Button, Box, Typography, useTheme } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
+import { useRouter } from 'next/navigation';
 
 import { leadPageInitialState, leadPageReducer, LeadPageStateType } from '@/modules/leads/leads.types';
 import { getLeadsData } from '@/modules/leads/leads.service';
 import LeadsTable from '@/modules/leads/ui/LeadsTable';
 import AddLeadModal from '@/modules/leads/ui/AddLeadModal';
+import { getCookieUser } from '@/utils/cookie.util';
 
 
 const LeadsPage = () => {
@@ -15,6 +17,14 @@ const LeadsPage = () => {
 
     const [state, dispatch] = useReducer(leadPageReducer, leadPageInitialState);
     const { leads, isLoading, page, limit, totalRows, search, isOpen } = state;
+    const user = getCookieUser()
+    const router = useRouter();
+
+    useEffect(() => {
+        if (!user) {
+            router.push('/');
+        }
+    }, [user, router]);
 
     const updateState = (value: Partial<LeadPageStateType>) => {
         dispatch({ type: 'update', payload: value });

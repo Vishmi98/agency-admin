@@ -2,11 +2,13 @@
 
 import { useCallback, useEffect, useReducer } from 'react';
 import { Box, Typography, useTheme } from '@mui/material';
+import { useRouter } from 'next/navigation';
 
 import StudentsTable from '@/modules/student/ui/StudentsTable';
 import { getStudentData } from '@/modules/student/services/student.services';
 import StudentSearch from '@/modules/student/ui/StudentSearch';
 import { studentPageInitialState, studentPageReducer, StudentPageStateType } from '@/modules/student/student.types';
+import { getCookieUser } from '@/utils/cookie.util';
 
 
 const StudentPage = () => {
@@ -14,6 +16,14 @@ const StudentPage = () => {
 
     const [state, dispatch] = useReducer(studentPageReducer, studentPageInitialState);
     const { students, isLoading, selectedStudent, page, limit, totalRows, search } = state;
+    const user = getCookieUser()
+    const router = useRouter();
+
+    useEffect(() => {
+        if (!user) {
+            router.push('/');
+        }
+    }, [user, router]);
 
     const updateState = (value: Partial<StudentPageStateType>) => {
         dispatch({ type: 'update', payload: value });

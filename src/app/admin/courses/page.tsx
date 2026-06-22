@@ -3,11 +3,13 @@
 import { useCallback, useEffect, useReducer } from 'react';
 import { Button, Box, Typography, useTheme } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
+import { useRouter } from 'next/navigation';
 
 import { coursePageInitialState, coursePageReducer, CoursePageStateType } from '@/modules/courses/courses.types';
 import { getCoursesData } from '@/modules/courses/services/courses.service';
 import CoursesTable from '@/modules/courses/ui/CoursesTable';
 import AddCourseModal from '@/modules/courses/ui/AddCourseModal';
+import { getCookieUser } from '@/utils/cookie.util';
 
 
 const CoursesPage = () => {
@@ -15,6 +17,14 @@ const CoursesPage = () => {
 
     const [state, dispatch] = useReducer(coursePageReducer, coursePageInitialState);
     const { courses, isLoading, page, limit, totalRows, search, isOpen } = state;
+    const user = getCookieUser()
+    const router = useRouter();
+
+    useEffect(() => {
+        if (!user) {
+            router.push('/');
+        }
+    }, [user, router]);
 
     const updateState = (value: Partial<CoursePageStateType>) => {
         dispatch({ type: 'update', payload: value });
