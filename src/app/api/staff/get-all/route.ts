@@ -5,16 +5,11 @@ import "@/models/common/gender.model";
 import TitleModel from "@/models/common/title.model";
 import StaffModel from "@/models/office/staff.model";
 import { sendErrorResponse, sendSuccessResponse } from "@/services/apiResponse";
-import { authenticate } from "@/lib/authenticate";
 import { decryptData } from "@/lib/decrypt";
 import { encryptData } from "@/lib/encrypt";
 
 
 export async function POST(req: NextRequest) {
-    // 🔹 Authenticate first
-    const authResult = await authenticate(req);
-    if (authResult instanceof Response) return authResult; // Stop if auth failed
-
     try {
         await connectDB();
 

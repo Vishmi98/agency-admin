@@ -1,6 +1,5 @@
 import { NextRequest } from "next/server";
 
-import { authenticate } from "@/lib/authenticate";
 import { connectDB } from "@/lib/mongodb";
 import BranchModel from "@/models/common/branch.model";
 import { sendErrorResponse, sendSuccessResponse } from "@/services/apiResponse";
@@ -9,10 +8,6 @@ import { encryptData } from "@/lib/encrypt";
 
 
 export async function POST(req: NextRequest) {
-    // 🔹 Authenticate first
-    const authResult = await authenticate(req);
-    if (authResult instanceof Response) return authResult; // Stop if auth failed
-
     try {
         await connectDB();
 
