@@ -31,9 +31,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
   return (
     <html lang="en">
-      <head>
-        <title>Real Smart Office</title>
-      </head>
       <body>
         <ThemeProvider theme={baseLightTheme}>
           <CssBaseline />

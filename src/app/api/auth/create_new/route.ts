@@ -37,6 +37,7 @@ export async function POST(req: NextRequest) {
             status,
             visaStatus,
             branchId,
+            isAgree
         } = decryptedBody;
 
         if (
@@ -81,7 +82,8 @@ export async function POST(req: NextRequest) {
             visaStatus,
             branchId,
             createDate: new Date(),
-            updatedDate: new Date()
+            updatedDate: new Date(),
+            isAgree: true
         });
 
         // 🔥 ENCRYPT RESPONSE (important)

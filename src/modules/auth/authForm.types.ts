@@ -12,5 +12,5 @@ export type UserLoginResponseType = {
 export type LoginResponseType = {
     success: boolean;
     message: string;
-    data: { token: string }
+    data: string;
 }

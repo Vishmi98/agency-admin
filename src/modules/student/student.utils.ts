@@ -23,7 +23,8 @@ export const addStudentInitialValues: StudentType = {
     createdBy: '',
     visaStatus: '',
     password: '',
-    branchId: ''
+    branchId: '',
+    isAgree: true,
 };
 
 export const addStudentValidationSchema = Yup.object({
@@ -97,8 +98,8 @@ export const addStudentValidationSchema = Yup.object({
         .matches(/[a-z]/, 'Password must contain at least one lowercase letter')
         .matches(/[0-9]/, 'Password must contain at least one number')
         .matches(/[@$!%*?&]/, 'Password must contain at least one special character (@$!%*?&)'),
-    branchId: Yup.string()
-        .required('Branch is required'),
-    createdBy: Yup.string()
-        .required('Staff member is required')
+    branchId: Yup.number(),
+    createdBy: Yup.number(),
+    isAgree: Yup.boolean()
+        .oneOf([true], "You must accept terms & conditions"),
 });

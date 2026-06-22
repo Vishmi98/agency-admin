@@ -21,6 +21,7 @@ export type StudentType = {
     createdBy: number | string;
     visaStatus: number | string;
     branchId?: number | string;
+    isAgree: boolean;
 };
 
 export type StudentDataType = {

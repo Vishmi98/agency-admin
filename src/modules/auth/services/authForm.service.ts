@@ -3,6 +3,7 @@ import { LoginFormType, LoginResponseType, UserLoginResponseType } from "../auth
 import apiCall from "@/services/api.services";
 import { URL } from "@/constants/config";
 import { encryptData } from "@/lib/encrypt";
+import { decryptData } from "@/lib/decrypt";
 
 
 export const handleUserLogin = async (body: LoginFormType): Promise<UserLoginResponseType> => {
@@ -18,16 +19,17 @@ export const handleUserLogin = async (body: LoginFormType): Promise<UserLoginRes
     })
 
     if (response?.success) {
+        const decryptedData = decryptData(response.data);
+
         return {
             success: true,
-            message: response?.message,
-            token: response?.data?.token
-        }
+            message: response.message,
+            token: decryptedData.token,
+        };
     }
-    else {
-        return {
-            success: false,
-            message: response?.message,
-        }
-    }
+
+    return {
+        success: false,
+        message: response?.message,
+    };
 };

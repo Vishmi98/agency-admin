@@ -17,12 +17,13 @@ export interface IStudent extends Document {
   address: string;
   nic: string;
   password: string;
-  createdBy: number; 
+  createdBy: number;
   createDate: Date;
   updatedDate: Date;
   visaStatus: number;
   status: number;
   branchId: number;
+  isAgree: boolean;
 }
 
 const studentSchema = new Schema({
@@ -46,34 +47,35 @@ const studentSchema = new Schema({
   updatedDate: { type: Date, default: Date.now },
   visaStatus: { type: Number, default: 100 },
   status: { type: Number, default: 100 },
-  branchId: { type: Number, required: true }
+  branchId: { type: Number, required: true },
+  isAgree: { type: Boolean, default: true }
 });
 
 studentSchema.virtual('titleInfo', {
   ref: 'Title',
-  localField: 'title', 
-  foreignField: 'id',  
+  localField: 'title',
+  foreignField: 'id',
   justOne: true,
 });
 
 studentSchema.virtual('statusInfo', {
   ref: 'StudentStatus',
-  localField: 'status', 
-  foreignField: 'id',  
+  localField: 'status',
+  foreignField: 'id',
   justOne: true,
 });
 
 studentSchema.virtual('visaStatusInfo', {
   ref: 'VistaStatus',
-  localField: 'visaStatus', 
-  foreignField: 'id',  
+  localField: 'visaStatus',
+  foreignField: 'id',
   justOne: true,
 });
 
 studentSchema.virtual('branchInfo', {
   ref: 'Branch',
-  localField: 'branchId', 
-  foreignField: 'id',  
+  localField: 'branchId',
+  foreignField: 'id',
   justOne: true,
 });
 

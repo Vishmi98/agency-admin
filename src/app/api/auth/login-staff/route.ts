@@ -6,6 +6,7 @@ import { sendErrorResponse, sendSuccessResponse } from "@/services/apiResponse";
 import StaffModel from "@/models/office/staff.model";
 import { generateAdminToken } from "@/utils/jwt";
 import { decryptData } from "@/lib/decrypt";
+import { encryptData } from "@/lib/encrypt";
 
 
 export async function POST(req: NextRequest) {
@@ -44,7 +45,14 @@ export async function POST(req: NextRequest) {
             email: user.email,
         });
 
-        return sendSuccessResponse("SUCCESS Admin login", { token });
+        const encryptedResponse = encryptData({
+            token,
+        });
+
+        return sendSuccessResponse(
+            "SUCCESS Admin login!",
+            encryptedResponse
+        );
     } catch (error) {
         return sendErrorResponse("Server error", 200);
     }
