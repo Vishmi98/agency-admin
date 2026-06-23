@@ -91,7 +91,7 @@ export async function POST(req: NextRequest) {
             student: newStudent
         });
 
-        return sendSuccessResponse("Student created successfully", encryptedResponse);
+        return sendSuccessResponse("Student registered successfully", encryptedResponse);
     } catch (error) {
         return sendErrorResponse("Server error", 200);
     }

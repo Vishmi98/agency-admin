@@ -12,6 +12,10 @@ import {
     Box,
     Dialog,
     DialogTitle,
+    FormControl,
+    InputLabel,
+    Select,
+    MenuItem,
 } from "@mui/material";
 import { toast } from "react-toastify";
 import Image from "next/image";
@@ -108,11 +112,21 @@ export default function StudentForm() {
             >
 
                 {/* HEADER */}
-                <Box sx={{ display: "flex", gap: {xs: 2, lg: 3}, p: {xs: 2, lg: 3}, alignItems: "center", justifyContent: "flex-start" }}>
+                <Box sx={{ display: "flex", gap: { xs: 2, lg: 3 }, p: { xs: 2, lg: 3 }, alignItems: "center", justifyContent: "flex-start" }}>
                     <Image src="/logo1.png" alt="logo" height={100} width={100} priority />
 
                     <Box>
-                        <Typography variant="h4" fontWeight={700}>
+                        <Typography
+                            fontWeight={700}
+                            sx={{
+                                fontSize: {
+                                    xs: "16px",
+                                    sm: "26px",
+                                    md: "30px",
+                                },
+                                marginBottom: 1
+                            }}
+                        >
                             Student Registration Form
                         </Typography>
                         <Typography variant="body2" sx={{ color: "#444" }}>
@@ -122,7 +136,7 @@ export default function StudentForm() {
                 </Box>
 
                 {/* FORM */}
-                <Box sx={{ p: {xs: 2, lg: 3} }}>
+                <Box sx={{ p: { xs: 2, lg: 3 } }}>
                     <Formik
                         initialValues={addStudentInitialValues}
                         validationSchema={addStudentValidationSchema}
@@ -138,23 +152,28 @@ export default function StudentForm() {
                                     <Grid container spacing={1}>
                                         <Grid item xs={12} md={6}>
                                             <Typography fontSize="12px">Title</Typography>
-                                            <Field
-                                                as="select"
-                                                name="title"
-                                                type="text"
-                                                className="border p-2 w-full rounded-md border-gray-300 text-[16px]"
-                                                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
-                                                    const selectedId = Number(e.target.value);
-                                                    setFieldValue('title', selectedId);
-                                                }}
-                                            >
-                                                <option value="">Select</option>
-                                                {titles.map((title) => (
-                                                    <option key={title.id} value={title.id}>
-                                                        {title.title?.EN || "No Titles"}
-                                                    </option>
-                                                ))}
-                                            </Field>
+                                            <FormControl fullWidth size="small">
+                                                <Select
+                                                    name="title"
+                                                    value={values.title}
+                                                    onChange={(e) =>
+                                                        setFieldValue("title", e.target.value)
+                                                    }
+                                                >
+                                                    <MenuItem value="">
+                                                        Select
+                                                    </MenuItem>
+
+                                                    {titles.map((title) => (
+                                                        <MenuItem
+                                                            key={title.id}
+                                                            value={title.id}
+                                                        >
+                                                            {title.title?.EN}
+                                                        </MenuItem>
+                                                    ))}
+                                                </Select>
+                                            </FormControl>
                                             <ErrorMessage name="title" component="div" className="text-red-300 text-xs m-1" />
                                         </Grid>
 
@@ -321,23 +340,28 @@ export default function StudentForm() {
 
                                         <Grid item xs={12} md={6}>
                                             <Typography fontSize="12px">Visa Status</Typography>
-                                            <Field
-                                                as="select"
-                                                name="visaStatus"
-                                                type="text"
-                                                className="border p-2 w-full rounded-md border-gray-300 text-[16px]"
-                                                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
-                                                    const selectedId = Number(e.target.value);
-                                                    setFieldValue('visaStatus', selectedId);
-                                                }}
-                                            >
-                                                <option value="">Select</option>
-                                                {visaStatuses.map((status) => (
-                                                    <option key={status.id} value={status.id}>
-                                                        {status.title["EN"]}
-                                                    </option>
-                                                ))}
-                                            </Field>
+                                            <FormControl fullWidth size="small">
+                                                <Select
+                                                    name="visaStatus"
+                                                    value={values.visaStatus}
+                                                    onChange={(e) =>
+                                                        setFieldValue("visaStatus", e.target.value)
+                                                    }
+                                                >
+                                                    <MenuItem value="">
+                                                        Select
+                                                    </MenuItem>
+
+                                                    {visaStatuses.map((visaStatus) => (
+                                                        <MenuItem
+                                                            key={visaStatus.id}
+                                                            value={visaStatus.id}
+                                                        >
+                                                            {visaStatus.title?.EN}
+                                                        </MenuItem>
+                                                    ))}
+                                                </Select>
+                                            </FormControl>
                                             <ErrorMessage name="visaStatus" component="div" className="text-red-300 text-xs m-1" />
                                         </Grid>
                                     </Grid>

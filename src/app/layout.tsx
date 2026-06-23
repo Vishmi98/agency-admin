@@ -1,21 +1,21 @@
-"use client";
+import ClientProviders from "@/app/ClientProviders";
 
-import { ToastContainer } from 'react-toastify';
-import { ThemeProvider } from "@mui/material/styles";
-import CssBaseline from "@mui/material/CssBaseline";
-import 'react-toastify/dist/ReactToastify.css';
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+};
 
-import { baseLightTheme } from "@/utils/theme/DefaultColors";
-
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="en">
       <body>
-        <ThemeProvider theme={baseLightTheme}>
-          <CssBaseline />
-          <ToastContainer />
+        <ClientProviders>
           {children}
-        </ThemeProvider>
+        </ClientProviders>
       </body>
     </html>
   );

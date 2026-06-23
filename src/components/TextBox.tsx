@@ -38,8 +38,9 @@ const TextBox: React.FC<TextBoxProps> = ({
                 }}
                 disabled={disabled}
                 sx={{
-                    "& .MuiInputBase-input": {
-                        fontSize: "16px", // input text size
+                    "& .MuiFormHelperText-root": {
+                        marginLeft: 0,
+                        color: "error.main"
                     },
                 }}
             />
