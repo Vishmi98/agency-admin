@@ -1,6 +1,6 @@
 import axios from "axios";
 
-import { CreateUniversityResponseDataType, CreateUniversityResponseType, CreateWebUniversityResponseDataType, CreateWebUniversityResponseType, FilterUniversityReportType, PublishWebUniversityResponseDataType, UniversitiesByCountryIdResponseDataType, UniversitiesByCountryIdResponseType, UniversityPaymentsResponseDataType, UniversityPaymentsResponseType, UniversityResponseDataType, UniversityResponseType, UniversityType, WebUniversityResponseDataType, WebUniversityResponseType } from "../university.types";
+import { CreateUniversityResponseDataType, CreateUniversityResponseType, CreateWebUniversityResponseDataType, CreateWebUniversityResponseType, FilterUniversityReportType, PublishWebUniversityResponseDataType, UniversitiesByCountryIdResponseDataType, UniversitiesByCountryIdResponseType, UniversityPaymentsResponseDataType, UniversityPaymentsResponseType, UniversityResponseDataType, UniversityResponseType, UniversityType, UpdateUniversityResponseDataType, UpdateUniversityResponseType, WebUniversityResponseDataType, WebUniversityResponseType } from "../university.types";
 
 import { URL } from "@/constants/config";
 import apiCall from "@/services/api.services";
@@ -170,5 +170,32 @@ export const publishWebUniversity = async (id: number, isPublish: boolean): Prom
         success: response.success,
         message: response.message,
         data: response.data
+    };
+};
+
+export const updateUniversity = async (id: string | number, body: UniversityType): Promise<UpdateUniversityResponseDataType> => {
+    const { id: _, ...restBody } = body;
+
+    const encryptedPayload = encryptData({
+        id,
+        ...restBody,
+    });
+
+    const response: UpdateUniversityResponseType = await apiCall({
+        url: `${URL}/university/update`,
+        method: 'POST',
+        body: {
+            payload: encryptedPayload,
+        },
+    });
+
+    const decryptedData = decryptData(response.data || "");
+
+    return {
+        success: response.success,
+        message: response.message,
+        data: {
+            university: decryptedData.university,
+        },
     };
 };

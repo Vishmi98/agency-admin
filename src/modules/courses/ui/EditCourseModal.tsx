@@ -9,27 +9,25 @@ import {
     DialogActions,
     DialogContent,
     DialogTitle,
-    FormControl,
     Grid,
     TextField,
     Typography,
     useTheme,
 } from "@mui/material";
-import { Formik, Form, FormikProps, Field, ErrorMessage, FieldArray } from "formik";
+import { Formik, Form, Field, FieldArray, FormikHelpers } from "formik";
 import { toast, ToastContainer } from "react-toastify";
 import CloseIcon from '@mui/icons-material/Close';
 
-import { CourseType } from "../courses.types";
-import { createCourse } from "../services/courses.service";
-import { addCourseInitialValues, addCourseValidationSchema } from "../courses.utils";
+import { CourseType, EditCourseModalProps } from "../courses.types";
+import { updateCourse } from "../services/courses.service";
+import { addCourseValidationSchema } from "../courses.utils";
 
 import TextBox from "@/components/TextBox";
 import { getUniversityData } from "@/modules/university/services/university.services";
-import { AddModalProps } from "@/modules/countries/countries.types";
 import { UniversityDataType } from "@/modules/university/university.types";
 
 
-const AddCourseModal: FC<AddModalProps> = ({ isOpen, onClose, handleReload }) => {
+const EditCourseModal: React.FC<EditCourseModalProps> = ({ isOpen, onClose, initialValues, reloadData }) => {
     const theme = useTheme();
 
     const [universities, setUniversities] = useState<UniversityDataType[]>([]);
@@ -51,26 +49,22 @@ const AddCourseModal: FC<AddModalProps> = ({ isOpen, onClose, handleReload }) =>
         if (isOpen) fetchData();
     }, [isOpen]);
 
-    const handleSubmit = async (
-        values: CourseType,
-        { resetForm }: { resetForm: () => void }
-    ) => {
+    const handleSubmit = async (values: CourseType, { resetForm }: FormikHelpers<CourseType>) => {
         try {
             setIsLoading(true);
-
-            const response = await createCourse(values);
+            const response = await updateCourse(values.id, values);
 
             if (response.success) {
                 toast.success(response.message);
-                handleReload();
+                reloadData();
                 onClose();
                 resetForm();
             } else {
                 toast.error(response.message);
             }
         } catch (error) {
-            toast.error("An error occurred while adding the course.");
-            console.log(error);
+            toast.error("An error occurred while updating the course.");
+            console.error(error);
         } finally {
             setIsLoading(false);
         }
@@ -82,16 +76,12 @@ const AddCourseModal: FC<AddModalProps> = ({ isOpen, onClose, handleReload }) =>
         setFieldValue,
         fieldName,
         placeholder,
-        error,
-        touched
     }: {
         label: string;
         value: string[];
         setFieldValue: (field: string, value: any) => void;
         fieldName: string;
         placeholder?: string;
-        error?: any;
-        touched?: any;
     }) => {
         const [input, setInput] = useState("");
 
@@ -112,24 +102,13 @@ const AddCourseModal: FC<AddModalProps> = ({ isOpen, onClose, handleReload }) =>
                 <Typography fontSize="12px">{label}</Typography>
 
                 <Box display="flex" gap={1}>
-                    <Box width="100%">
-                        <TextField
-                            size="small"
-                            fullWidth
-                            placeholder={placeholder}
-                            value={input}
-                            onChange={(e) => setInput(e.target.value)}
-                        />
-                        {touched && error && (
-                            <Typography
-                                variant="caption"
-                                color="error"
-                                sx={{ mt: 0.5, display: "block" }}
-                            >
-                                {error}
-                            </Typography>
-                        )}
-                    </Box>
+                    <TextField
+                        size="small"
+                        fullWidth
+                        placeholder={placeholder}
+                        value={input}
+                        onChange={(e) => setInput(e.target.value)}
+                    />
                     <Box sx={{ alignItems: "center", justifyContent: "center", mt: 0.5 }}>
                         <Button
                             variant="contained"
@@ -176,6 +155,8 @@ const AddCourseModal: FC<AddModalProps> = ({ isOpen, onClose, handleReload }) =>
         );
     };
 
+    if (!initialValues) return null;
+
     return (
         <>
             <Dialog
@@ -202,16 +183,16 @@ const AddCourseModal: FC<AddModalProps> = ({ isOpen, onClose, handleReload }) =>
                             color: theme.palette.text.primary,
                         }}
                     >
-                        Add New Course
+                        Edit Course
                     </DialogTitle>
                     <CloseIcon data-testid="CloseIcon" sx={{ width: 15, height: 15, marginRight: 3 }} onClick={onClose} />
                 </Box>
                 <Formik
-                    initialValues={addCourseInitialValues}
+                    initialValues={initialValues}
                     validationSchema={addCourseValidationSchema}
                     onSubmit={handleSubmit}
                 >
-                    {({ touched, errors, isSubmitting, setFieldValue, values }: FormikProps<CourseType>) => (
+                    {({ touched, errors, isSubmitting, setFieldValue, dirty, values }) => (
                         <Form>
                             <DialogContent
                                 sx={{
@@ -282,6 +263,11 @@ const AddCourseModal: FC<AddModalProps> = ({ isOpen, onClose, handleReload }) =>
                                             options={universities}
                                             getOptionLabel={(option) => option.name}
                                             loading={isLoading}
+                                            value={
+                                                universities.find(
+                                                    (u) => u.id === values.universityId
+                                                ) || null
+                                            }
                                             onChange={(event, value) => {
                                                 setFieldValue('universityId', value ? value.id : '');
                                             }}
@@ -294,7 +280,6 @@ const AddCourseModal: FC<AddModalProps> = ({ isOpen, onClose, handleReload }) =>
                                                     fullWidth
                                                     error={touched.universityId && Boolean(errors.universityId)}
                                                     helperText={touched.universityId && errors.universityId}
-                                                    sx={{ fontSize: "16px" }}
                                                 />
                                             )}
                                         />
@@ -480,8 +465,6 @@ const AddCourseModal: FC<AddModalProps> = ({ isOpen, onClose, handleReload }) =>
                                             setFieldValue={setFieldValue}
                                             fieldName="specializations"
                                             placeholder="AI, Cyber Security..."
-                                            error={errors.specializations}
-                                            touched={touched.specializations}
                                         />
                                     </Grid>
                                     <Grid item xs={12}>
@@ -491,8 +474,6 @@ const AddCourseModal: FC<AddModalProps> = ({ isOpen, onClose, handleReload }) =>
                                             setFieldValue={setFieldValue}
                                             fieldName="intakes"
                                             placeholder="January, May..."
-                                            error={errors.intakes}
-                                            touched={touched.intakes}
                                         />
                                     </Grid>
                                     <Grid item xs={12}>
@@ -502,8 +483,6 @@ const AddCourseModal: FC<AddModalProps> = ({ isOpen, onClose, handleReload }) =>
                                             setFieldValue={setFieldValue}
                                             fieldName="entryRequirements"
                                             placeholder="Requirement..."
-                                            error={errors.entryRequirements}
-                                            touched={touched.entryRequirements}
                                         />
                                     </Grid>
                                     <Grid item xs={12}>
@@ -513,8 +492,6 @@ const AddCourseModal: FC<AddModalProps> = ({ isOpen, onClose, handleReload }) =>
                                             setFieldValue={setFieldValue}
                                             fieldName="careerOpportunities"
                                             placeholder="Software Engineer..."
-                                            error={errors.careerOpportunities}
-                                            touched={touched.careerOpportunities}
                                         />
                                     </Grid>
                                     <Grid item xs={12}>
@@ -524,8 +501,6 @@ const AddCourseModal: FC<AddModalProps> = ({ isOpen, onClose, handleReload }) =>
                                             setFieldValue={setFieldValue}
                                             fieldName="features"
                                             placeholder="Top Ranked, Internship..."
-                                            error={errors.features}
-                                            touched={touched.features}
                                         />
                                     </Grid>
                                 </Grid>
@@ -558,7 +533,7 @@ const AddCourseModal: FC<AddModalProps> = ({ isOpen, onClose, handleReload }) =>
                                     type="submit"
                                     variant="contained"
                                     color="primary"
-                                    disabled={isSubmitting}
+                                    disabled={isSubmitting || !dirty}
                                     sx={{
                                         backgroundColor: "#1976d2",
                                         borderRadius: "5px",
@@ -567,7 +542,7 @@ const AddCourseModal: FC<AddModalProps> = ({ isOpen, onClose, handleReload }) =>
                                         width: "200px"
                                     }}
                                 >
-                                    Save Course
+                                    Save
                                 </Button>
                             </DialogActions>
                         </Form>
@@ -579,4 +554,4 @@ const AddCourseModal: FC<AddModalProps> = ({ isOpen, onClose, handleReload }) =>
     );
 };
 
-export default AddCourseModal;
+export default EditCourseModal;

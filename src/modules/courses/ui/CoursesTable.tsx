@@ -1,10 +1,14 @@
 "use client";
 
 import React, { useState } from 'react';
-import { Box, IconButton, Paper, Skeleton, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Typography } from '@mui/material';
+import { Box, Dialog, DialogContent, IconButton, Paper, Skeleton, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Typography } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import EditIcon from '@mui/icons-material/Edit';
+import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
 
+import Course from './Course';
 import { CourseDataType, CourseTableProps } from '../courses.types';
+import EditCourseModal from './EditCourseModal';
 
 
 const CoursesTable: React.FC<CourseTableProps> = ({
@@ -15,15 +19,22 @@ const CoursesTable: React.FC<CourseTableProps> = ({
     limit,
     onPageChange,
     onRowsPerPageChange,
+    selectedCourse,
+    setSelectedCourse,
+    reloadData
 }) => {
     const [expandedRows, setExpandedRows] = useState<number[]>([]);
+    const [openEditModal, setOpenEditModal] = useState(false);
+    const [openPreviewModal, setOpenPreviewModal] = useState(false);
 
     const columns = [
-        { label: "Course ID", key: "id", width: "15%", align: "center" as const },
+        { label: "Course ID", key: "id", width: "10%", align: "center" as const },
         { label: "Title", key: "title", width: "30%", align: "left" as const },
         { label: "University", key: "universityInfo.name", width: "30%", align: "left" as const },
         { label: "Country", key: "country", width: "15%", align: "left" as const },
-        { label: "", key: "actions", width: "10%", align: "center" as const },
+        { label: "", key: "actions", width: "5%", align: "center" as const },
+        { label: "", key: "actions", width: "5%", align: "center" as const },
+        { label: "", key: "actions", width: "5%", align: "center" as const },
     ];
 
     const toggleExpandRow = (courseId: number) => {
@@ -32,6 +43,16 @@ const CoursesTable: React.FC<CourseTableProps> = ({
                 ? prev.filter((id) => id !== courseId)
                 : [...prev, courseId]
         );
+    };
+
+    const handleEditClick = (course: CourseDataType) => {
+        setSelectedCourse(course);
+        setOpenEditModal(true);
+    };
+
+    const handlePreviewClick = (course: CourseDataType) => {
+        setSelectedCourse(course);
+        setOpenPreviewModal(true);
     };
 
     const expandedContent = (course: CourseDataType) => (
@@ -269,6 +290,18 @@ const CoursesTable: React.FC<CourseTableProps> = ({
                             "-"}
                     </TableCell>
 
+                    <TableCell>
+                        <IconButton onClick={() => handleEditClick(course)}>
+                            <EditIcon fontSize="small" />
+                        </IconButton>
+                    </TableCell>
+
+                    <TableCell align="right">
+                        <IconButton onClick={() => handlePreviewClick(course)}>
+                            <RemoveRedEyeIcon fontSize="small" />
+                        </IconButton>
+                    </TableCell>
+
                     <TableCell align="center">
                         <IconButton
                             size="small"
@@ -304,60 +337,87 @@ const CoursesTable: React.FC<CourseTableProps> = ({
     };
 
     return (
-        <Box>
-            <TableContainer
-                component={Paper}
-                elevation={0}
-                sx={{ maxHeight: 370, overflowY: "auto", borderRadius: "5px" }}
-            >
-                <Table
-                    stickyHeader
-                    sx={{
-                        minWidth: 700,
-                        borderCollapse: "collapse",
-                        "& th": {
-                            fontWeight: "bold",
-                            fontSize: 12,
-                            borderBottom: "1px solid #ddd",
-                            py: 1,
-                            backgroundColor: "#fff",
-                        },
-                        "& td": { fontSize: 12, py: 1 },
-                    }}
+        <>
+            <Box>
+                <TableContainer
+                    component={Paper}
+                    elevation={0}
+                    sx={{ maxHeight: 370, overflowY: "auto", borderRadius: "5px" }}
                 >
-                    <TableHead>
-                        <TableRow>
-                            {columns.map((col) => (
-                                <TableCell
-                                    key={col.key}
-                                    align={col.align}
-                                    sx={{
-                                        fontWeight: "bold",
-                                        fontSize: 12,
-                                        backgroundColor: "#fff",
-                                        borderBottom: "1px solid #ddd",
-                                        width: col.width
-                                    }}
-                                >
-                                    {col.label}
-                                </TableCell>
-                            ))}
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>{renderRows()}</TableBody>
-                </Table>
-            </TableContainer>
+                    <Table
+                        stickyHeader
+                        sx={{
+                            minWidth: 700,
+                            borderCollapse: "collapse",
+                            "& th": {
+                                fontWeight: "bold",
+                                fontSize: 12,
+                                borderBottom: "1px solid #ddd",
+                                py: 1,
+                                backgroundColor: "#fff",
+                            },
+                            "& td": { fontSize: 12, py: 1 },
+                        }}
+                    >
+                        <TableHead>
+                            <TableRow>
+                                {columns.map((col) => (
+                                    <TableCell
+                                        key={col.key}
+                                        align={col.align}
+                                        sx={{
+                                            fontWeight: "bold",
+                                            fontSize: 12,
+                                            backgroundColor: "#fff",
+                                            borderBottom: "1px solid #ddd",
+                                            width: col.width
+                                        }}
+                                    >
+                                        {col.label}
+                                    </TableCell>
+                                ))}
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>{renderRows()}</TableBody>
+                    </Table>
+                </TableContainer>
 
-            <TablePagination
-                rowsPerPageOptions={[5, 10, 15]}
-                component="div"
-                count={totalRows}
-                rowsPerPage={limit}
-                page={page}
-                onPageChange={(e, newPage) => onPageChange(newPage)}
-                onRowsPerPageChange={(e) => onRowsPerPageChange(parseInt(e.target.value, 10))}
-            />
-        </Box>
+                <TablePagination
+                    rowsPerPageOptions={[5, 10, 15]}
+                    component="div"
+                    count={totalRows}
+                    rowsPerPage={limit}
+                    page={page}
+                    onPageChange={(e, newPage) => onPageChange(newPage)}
+                    onRowsPerPageChange={(e) => onRowsPerPageChange(parseInt(e.target.value, 10))}
+                />
+            </Box>
+
+            {openEditModal && selectedCourse && (
+                <EditCourseModal
+                    isOpen={openEditModal}
+                    onClose={() => setOpenEditModal(false)}
+                    initialValues={selectedCourse}
+                    reloadData={reloadData}
+                />
+            )}
+
+            <Dialog
+                open={openPreviewModal}
+                onClose={() => setOpenPreviewModal(false)}
+                maxWidth="md"
+                fullWidth
+            >
+                <DialogContent>
+                    {selectedCourse && (
+                        <Course
+                            course={selectedCourse}
+                            setIsModalOpen={setOpenPreviewModal}
+                        />
+                    )}
+                </DialogContent>
+            </Dialog>
+        </>
     );
 };
 

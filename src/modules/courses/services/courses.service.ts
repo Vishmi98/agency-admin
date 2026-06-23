@@ -1,6 +1,6 @@
 import axios from "axios";
 
-import { CoursesResponseDataType, CoursesResponseType, CourseType, CreateCourseResponseDataType, CreateCourseResponseType, CreateWebCourseResponseDataType, CreateWebCourseResponseType, PublishWebCourseResponseDataType, WebCoursesResponseDataType, WebCoursesResponseType, WebCourseType } from "../courses.types";
+import { CoursesResponseDataType, CoursesResponseType, CourseType, CreateCourseResponseDataType, CreateCourseResponseType, CreateWebCourseResponseDataType, CreateWebCourseResponseType, PublishWebCourseResponseDataType, UpdateCourseResponseDataType, UpdateCourseResponseType, WebCoursesResponseDataType, WebCoursesResponseType, WebCourseType } from "../courses.types";
 
 import apiCall from "@/services/api.services";
 import { URL } from "@/constants/config";
@@ -95,6 +95,33 @@ export const createCourse = async (body: CourseType): Promise<CreateCourseRespon
 
     const response: CreateCourseResponseType = await apiCall({
         url: `${URL}/course/create`,
+        method: 'POST',
+        body: {
+            payload: encryptedPayload,
+        },
+    });
+
+    const decryptedData = decryptData(response.data || "");
+
+    return {
+        success: response.success,
+        message: response.message,
+        data: {
+            course: decryptedData.course,
+        },
+    };
+};
+
+export const updateCourse = async (id: string | number, body: CourseType): Promise<UpdateCourseResponseDataType> => {
+    const { id: _, ...restBody } = body;
+
+    const encryptedPayload = encryptData({
+        id,
+        ...restBody,
+    });
+
+    const response: UpdateCourseResponseType = await apiCall({
+        url: `${URL}/course/update`,
         method: 'POST',
         body: {
             payload: encryptedPayload,

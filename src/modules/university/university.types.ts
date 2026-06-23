@@ -373,3 +373,24 @@ export type PublishWebUniversityResponseDataType = {
     message: string;
     data: WebUniversityType
 }
+
+export type EditUniversityModalProps = {
+    isOpen: boolean;
+    onClose: () => void;
+    reloadData: () => void;
+    initialValues: UniversityType | null;
+}
+
+export type UpdateUniversityResponseDataType = {
+    success: boolean;
+    message: string;
+    data: {
+        university: UniversityType;
+    }
+}
+
+export type UpdateUniversityResponseType = {
+    success: boolean;
+    message: string;
+    data: string;
+}

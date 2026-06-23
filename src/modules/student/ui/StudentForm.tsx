@@ -459,7 +459,7 @@ export default function StudentForm() {
                     <Box display="flex" flexDirection="column" alignItems="center" gap={1}>
                         <CheckCircleIcon sx={{ fontSize: 60, color: "success.main" }} />
 
-                        <Typography fontWeight={700} fontSize={22}>
+                        <Typography fontWeight={700} sx={{ fontSize: {xs: "20px", lg: "24px"} }}>
                             Registration Successful
                         </Typography>
 

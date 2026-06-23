@@ -100,6 +100,7 @@ export type PublishWebCourseResponseDataType = {
 }
 
 export type CourseType = {
+    id: number,
     title: string;
     shortCode?: string;
     description?: string;
@@ -157,6 +158,7 @@ export type CoursePageStateType = {
     totalRows: number;
     search: string;
     isOpen: boolean;
+    selectedCourse: CourseDataType | null;
 };
 
 export const coursePageInitialState: CoursePageStateType = {
@@ -166,7 +168,8 @@ export const coursePageInitialState: CoursePageStateType = {
     limit: 5,
     totalRows: 0,
     search: "",
-    isOpen: false
+    isOpen: false,
+    selectedCourse: null,
 };
 
 export const coursePageReducer = (
@@ -192,6 +195,8 @@ export type CourseTableProps = {
     onPageChange: (i: number) => void
     onRowsPerPageChange: (i: number) => void
     reloadData: () => void
+    selectedCourse: CourseDataType | null,
+    setSelectedCourse: (i: CourseDataType) => void,
 }
 
 export type CourseSearchProps = {
@@ -230,4 +235,30 @@ export type CreateCourseResponseDataType = {
     data: {
         course: CourseType;
     }
+}
+
+export type EditCourseModalProps = {
+    isOpen: boolean;
+    onClose: () => void;
+    reloadData: () => void;
+    initialValues: CourseType | null;
+}
+
+export type UpdateCourseResponseDataType = {
+    success: boolean;
+    message: string;
+    data: {
+        course: CourseType;
+    }
+}
+
+export type UpdateCourseResponseType = {
+    success: boolean;
+    message: string;
+    data: string;
+}
+
+export type CourseProp = {
+    course: CourseDataType,
+    setIsModalOpen: (open: boolean) => void
 }

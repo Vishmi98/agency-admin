@@ -16,7 +16,7 @@ const CoursesPage = () => {
     const theme = useTheme();
 
     const [state, dispatch] = useReducer(coursePageReducer, coursePageInitialState);
-    const { courses, isLoading, page, limit, totalRows, search, isOpen } = state;
+    const { courses, isLoading, page, limit, totalRows, search, isOpen, selectedCourse } = state;
     const user = getCookieUser()
     const router = useRouter();
 
@@ -138,6 +138,8 @@ const CoursesPage = () => {
                         onPageChange={handlePageChange}
                         onRowsPerPageChange={handleRowsPerPageChange}
                         reloadData={() => fetchCoursesData(true, page)}
+                        selectedCourse={selectedCourse}
+                        setSelectedCourse={(staff) => updateState({ selectedCourse: staff })}
                     />
                 </Box>
             </Box>
