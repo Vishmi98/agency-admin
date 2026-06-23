@@ -110,7 +110,7 @@ const AddStudent = () => {
                                     <Field
                                         as="select"
                                         name="title"
-                                        className="border p-2 w-full rounded-md border-gray-300"
+                                        className="border p-2 w-full rounded-md border-gray-300 text-[16px]"
                                         onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
                                             const selectedId = Number(e.target.value);
                                             setFieldValue('title', selectedId);
@@ -221,7 +221,7 @@ const AddStudent = () => {
                                     <Field
                                         as="select"
                                         name="branchId"
-                                        className="border p-2 w-full rounded-md border-gray-300"
+                                        className="border p-2 w-full rounded-md border-gray-300 text-[16px]"
                                         onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
                                             const selectedId = Number(e.target.value);
                                             setFieldValue('branchId', selectedId);
@@ -255,6 +255,7 @@ const AddStudent = () => {
                                                 fullWidth
                                                 error={touched.createdBy && Boolean(errors.createdBy)}
                                                 helperText={touched.createdBy && errors.createdBy}
+                                                sx={{ fontSize: "16px" }}
                                             />
                                         )}
                                     />
@@ -336,7 +337,7 @@ const AddStudent = () => {
                                     <Field
                                         as="select"
                                         name="visaStatus"
-                                        className="border p-2 w-full rounded-md border-gray-300"
+                                        className="border p-2 w-full rounded-md border-gray-300 text-[16px]"
                                         onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
                                             const selectedId = Number(e.target.value);
                                             setFieldValue('visaStatus', selectedId);

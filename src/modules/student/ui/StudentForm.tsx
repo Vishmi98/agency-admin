@@ -1,26 +1,19 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { ErrorMessage, Field, Form, Formik, useFormik } from "formik";
+import { ErrorMessage, Field, Form, Formik } from "formik";
 import {
-    TextField,
     Button,
     Grid,
     Paper,
     Typography,
     FormControlLabel,
     Checkbox,
-    MenuItem,
     Box,
     Dialog,
     DialogTitle,
-    DialogContent,
-    DialogActions,
-    Divider,
-    Autocomplete,
 } from "@mui/material";
 import { toast } from "react-toastify";
-import { useRouter } from "next/navigation";
 import Image from "next/image";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 
@@ -35,8 +28,6 @@ import { StaffDataType } from "@/modules/staff/staff.types";
 
 
 export default function StudentForm() {
-    const router = useRouter();
-
     const [titles, setTitles] = useState<DropdownType[]>([]);
     const [visaStatuses, setVisaStatuses] = useState<DropdownType[]>([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -117,7 +108,7 @@ export default function StudentForm() {
             >
 
                 {/* HEADER */}
-                <Box sx={{ display: "flex", gap: 3, p: 3, alignItems: "center" }}>
+                <Box sx={{ display: "flex", gap: {xs: 2, lg: 3}, p: {xs: 2, lg: 3}, alignItems: "center", justifyContent: "flex-start" }}>
                     <Image src="/logo1.png" alt="logo" height={100} width={100} priority />
 
                     <Box>
@@ -131,7 +122,7 @@ export default function StudentForm() {
                 </Box>
 
                 {/* FORM */}
-                <Box sx={{ p: 4 }}>
+                <Box sx={{ p: {xs: 2, lg: 3} }}>
                     <Formik
                         initialValues={addStudentInitialValues}
                         validationSchema={addStudentValidationSchema}
@@ -150,7 +141,8 @@ export default function StudentForm() {
                                             <Field
                                                 as="select"
                                                 name="title"
-                                                className="border p-2 w-full rounded-md border-gray-300"
+                                                type="text"
+                                                className="border p-2 w-full rounded-md border-gray-300 text-[16px]"
                                                 onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
                                                     const selectedId = Number(e.target.value);
                                                     setFieldValue('title', selectedId);
@@ -332,13 +324,14 @@ export default function StudentForm() {
                                             <Field
                                                 as="select"
                                                 name="visaStatus"
-                                                className="border p-2 w-full rounded-md border-gray-300"
+                                                type="text"
+                                                className="border p-2 w-full rounded-md border-gray-300 text-[16px]"
                                                 onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
                                                     const selectedId = Number(e.target.value);
                                                     setFieldValue('visaStatus', selectedId);
                                                 }}
                                             >
-                                                <option value="">Select Visa Status</option>
+                                                <option value="">Select</option>
                                                 {visaStatuses.map((status) => (
                                                     <option key={status.id} value={status.id}>
                                                         {status.title["EN"]}

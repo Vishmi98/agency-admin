@@ -37,6 +37,11 @@ const TextBox: React.FC<TextBoxProps> = ({
                     shrink: true,
                 }}
                 disabled={disabled}
+                sx={{
+                    "& .MuiInputBase-input": {
+                        fontSize: "16px", // input text size
+                    },
+                }}
             />
         </FormControl>
     );

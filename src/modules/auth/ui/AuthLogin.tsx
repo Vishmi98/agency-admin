@@ -11,12 +11,12 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff";
 
 import { loginFormInitialValues, loginFormValidationSchema } from "../authForm.utils";
 import { handleUserLogin } from "../services/authForm.service";
+import { LoginFormType } from "../authForm.types";
 
 import { LOCAL_STORE } from "@/constants/key";
 import { REDIRECT_ROUTE } from "@/constants/data";
 import { UserStoreUserType } from "@/type/common.types";
 import { handleSaveCookieToken, handleSaveCookieUser } from "@/utils/cookie.util";
-import { LoginFormType } from "../authForm.types";
 
 
 const AuthLogin = () => {
@@ -64,7 +64,7 @@ const AuthLogin = () => {
         >
           {({ values, handleChange, handleBlur, errors }) => (
             <Form>
-              <Stack spacing={2}>
+              <Stack spacing={1}>
                 <Box>
                   <Typography variant="subtitle1" fontWeight={600} component="label" htmlFor="id_number" mb="5px">
                     Email
@@ -81,6 +81,35 @@ const AuthLogin = () => {
                     error={Boolean(errors.email)}
                     helperText={<ErrorMessage name="email" />}
                     disabled={isLoading}
+                    sx={{
+                      "& .MuiOutlinedInput-root": {
+                        borderRadius: "5px",
+                        backgroundColor: "#fff",
+
+                        "& fieldset": {
+                          borderColor: "#d1d5db",
+                        },
+
+                        "&:hover fieldset": {
+                          borderColor: "#1976d2",
+                        },
+
+                        "&.Mui-focused fieldset": {
+                          borderColor: "#1976d2",
+                          borderWidth: "2px",
+                        },
+                      },
+
+                      "& .MuiInputBase-input": {
+                        fontSize: "15px",
+                        padding: "14px 16px",
+                      },
+
+                      "& .MuiFormHelperText-root": {
+                        marginLeft: 0,
+                        fontSize: "12px",
+                      },
+                    }}
                   />
                 </Box>
 
@@ -88,7 +117,7 @@ const AuthLogin = () => {
                   <Typography variant="subtitle1" fontWeight={600} component="label" htmlFor="password" mb="5px">
                     Password
                   </Typography>
-                  <Box display="flex" alignItems="center">
+                  <Box display="flex" alignItems="center" justifyContent="center" marginBottom={1}>
                     <Field
                       as={TextField}
                       name="password"
@@ -101,6 +130,35 @@ const AuthLogin = () => {
                       error={Boolean(errors.password)}
                       helperText={<ErrorMessage name="password" />}
                       disabled={isLoading}
+                      sx={{
+                        "& .MuiOutlinedInput-root": {
+                          borderRadius: "5px",
+                          backgroundColor: "#fff",
+
+                          "& fieldset": {
+                            borderColor: "#d1d5db",
+                          },
+
+                          "&:hover fieldset": {
+                            borderColor: "#1976d2",
+                          },
+
+                          "&.Mui-focused fieldset": {
+                            borderColor: "#1976d2",
+                            borderWidth: "2px",
+                          },
+                        },
+
+                        "& .MuiInputBase-input": {
+                          fontSize: "15px",
+                          padding: "14px 16px",
+                        },
+
+                        "& .MuiFormHelperText-root": {
+                          marginLeft: 0,
+                          fontSize: "12px",
+                        },
+                      }}
                     />
                     <IconButton onClick={() => setShowPassword((prev) => !prev)}>
                       {showPassword ? <VisibilityOff /> : <Visibility />}

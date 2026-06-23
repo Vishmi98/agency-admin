@@ -124,7 +124,7 @@ const EditStaffModal: React.FC<EditStaffModalProps> = ({ isOpen, onClose, initia
                                         <Field
                                             as="select"
                                             name="title"
-                                            className="border p-2 w-full rounded-md border-gray-300"
+                                            className="border p-2 w-full rounded-md border-gray-300 text-[16px]"
                                             onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
                                                 setFieldValue('title', Number(e.target.value));
                                             }}
@@ -141,7 +141,7 @@ const EditStaffModal: React.FC<EditStaffModalProps> = ({ isOpen, onClose, initia
                                         <Field
                                             as="select"
                                             name="gender"
-                                            className="border p-2 w-full rounded-md border-gray-300"
+                                            className="border p-2 w-full rounded-md border-gray-300 text-[16px]"
                                             onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
                                                 setFieldValue('gender', Number(e.target.value));
                                             }}
@@ -230,7 +230,7 @@ const EditStaffModal: React.FC<EditStaffModalProps> = ({ isOpen, onClose, initia
                                         <Field
                                             as="select"
                                             name="branchId"
-                                            className="border p-2 w-full rounded-md border-gray-300"
+                                            className="border p-2 w-full rounded-md border-gray-300 text-[16px]"
                                             onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
                                                 setFieldValue('branchId', Number(e.target.value));
                                             }}
@@ -247,7 +247,7 @@ const EditStaffModal: React.FC<EditStaffModalProps> = ({ isOpen, onClose, initia
                                         <Field
                                             as="select"
                                             name="roll"
-                                            className="border p-2 w-full rounded-md border-gray-300"
+                                            className="border p-2 w-full rounded-md border-gray-300 text-[16px]"
                                             onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
                                                 setFieldValue('roll', Number(e.target.value));
                                             }}

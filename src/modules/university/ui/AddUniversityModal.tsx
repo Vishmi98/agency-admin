@@ -186,7 +186,7 @@ const AddUniversityModal: FC<AddModalProps> = ({ isOpen, onClose, handleReload }
                                         <Field
                                             as="select"
                                             name="countryId"
-                                            className="border p-2 w-full rounded-md border-gray-300"
+                                            className="border p-2 w-full rounded-md border-gray-300 text-[16px]"
                                             onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
                                                 const selectedId = Number(e.target.value);
                                                 setFieldValue('countryId', selectedId);

@@ -118,13 +118,13 @@ const AddStaffModal: FC<AddModalProps> = ({ isOpen, onClose, handleReload }) => 
                                     backgroundColor: theme.palette.background.paper,
                                 }}
                             >
-                                <Grid container spacing={2}>
+                                <Grid container spacing={1}>
                                     <Grid item xs={12} sm={6}>
                                         <Typography fontSize="12px">Title</Typography>
                                         <Field
                                             as="select"
                                             name="title"
-                                            className="border p-2 w-full rounded-md border-gray-300"
+                                            className="border p-2 w-full rounded-md border-gray-300 text-[16px]"
                                             onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
                                                 setFieldValue('title', Number(e.target.value));
                                             }}
@@ -141,7 +141,7 @@ const AddStaffModal: FC<AddModalProps> = ({ isOpen, onClose, handleReload }) => 
                                         <Field
                                             as="select"
                                             name="gender"
-                                            className="border p-2 w-full rounded-md border-gray-300"
+                                            className="border p-2 w-full rounded-md border-gray-300 text-[16px]"
                                             onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
                                                 setFieldValue('gender', Number(e.target.value));
                                             }}
@@ -242,7 +242,7 @@ const AddStaffModal: FC<AddModalProps> = ({ isOpen, onClose, handleReload }) => 
                                         <Field
                                             as="select"
                                             name="branchId"
-                                            className="border p-2 w-full rounded-md border-gray-300"
+                                            className="border p-2 w-full rounded-md border-gray-300 text-[16px]"
                                             onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
                                                 setFieldValue('branchId', Number(e.target.value));
                                             }}
@@ -259,7 +259,7 @@ const AddStaffModal: FC<AddModalProps> = ({ isOpen, onClose, handleReload }) => 
                                         <Field
                                             as="select"
                                             name="roll"
-                                            className="border p-2 w-full rounded-md border-gray-300"
+                                            className="border p-2 w-full rounded-md border-gray-300 text-[16px]"
                                             onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
                                                 setFieldValue('roll', Number(e.target.value));
                                             }}

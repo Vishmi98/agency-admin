@@ -279,6 +279,7 @@ const AddCourseModal: FC<AddModalProps> = ({ isOpen, onClose, handleReload }) =>
                                                     fullWidth
                                                     error={touched.universityId && Boolean(errors.universityId)}
                                                     helperText={touched.universityId && errors.universityId}
+                                                    sx={{ fontSize: "16px" }}
                                                 />
                                             )}
                                         />
