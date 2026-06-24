@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useReducer } from 'react';
+import { useCallback, useEffect, useMemo, useReducer, useRef } from 'react';
 import { Box, Typography, useTheme } from '@mui/material';
 import { useRouter } from 'next/navigation';
 
@@ -9,6 +9,7 @@ import { getStudentData } from '@/modules/student/services/student.services';
 import StudentSearch from '@/modules/student/ui/StudentSearch';
 import { studentPageInitialState, studentPageReducer, StudentPageStateType } from '@/modules/student/student.types';
 import { getCookieUser } from '@/utils/cookie.util';
+import { logActivity } from '@/utils/logActivity';
 
 
 const StudentPage = () => {
@@ -16,14 +17,9 @@ const StudentPage = () => {
 
     const [state, dispatch] = useReducer(studentPageReducer, studentPageInitialState);
     const { students, isLoading, selectedStudent, page, limit, totalRows, search } = state;
-    const user = getCookieUser()
+    const user = useMemo(() => getCookieUser(), []);
+    const didFetch = useRef(false);
     const router = useRouter();
-
-    useEffect(() => {
-        if (!user) {
-            router.push('/');
-        }
-    }, [user, router]);
 
     const updateState = (value: Partial<StudentPageStateType>) => {
         dispatch({ type: 'update', payload: value });
@@ -46,26 +42,88 @@ const StudentPage = () => {
     }, [page, limit, search]);
 
     useEffect(() => {
+        if (!user) {
+            router.push('/');
+            return;
+        }
+
+        if (didFetch.current) return;
+        didFetch.current = true;
+
         fetchStudentData(true);
-    }, [limit]);
+
+        // ✅ activity log ONLY ONCE
+        logActivity({
+            userId: user.id,
+            action: "STUDENTS_PAGE_VIEW",
+            path: "/app/admin/students",
+            method: "CLIENT",
+        });
+
+    }, []);
 
     const handlePageChange = (newPage: number) => {
         updateState({ page: newPage });
         fetchStudentData(true, newPage);
+
+        if (user) {
+            logActivity({
+                userId: user.id,
+                action: "STUDENTS_PAGE_CHANGE",
+                path: "/app/admin/students",
+                method: "CLIENT",
+                meta: {
+                    page: newPage
+                }
+            });
+        }
     };
 
     const handleRowsPerPageChange = (rows: number) => {
         updateState({ limit: rows, page: 0 });
+
+        if (user) {
+            logActivity({
+                userId: user.id,
+                action: "STUDENTS_LIMIT_CHANGE",
+                path: "/app/admin/students",
+                method: "CLIENT",
+                meta: {
+                    limit: rows
+                }
+            });
+        }
     };
 
     const handleSearch = async () => {
         updateState({ page: 0, limit: 5 });
         await fetchStudentData(false, 0);
+
+        if (user) {
+            logActivity({
+                userId: user.id,
+                action: "STUDENTS_SEARCH",
+                path: "/app/admin/students",
+                method: "CLIENT",
+                meta: {
+                    search: search // add this
+                }
+            });
+        }
     };
 
     const handleClearSearch = async () => {
         updateState({ search: '', page: 0, limit: 5 });
         await fetchStudentData(false, 0, true);
+
+        if (user) {
+            logActivity({
+                userId: user.id,
+                action: "STUDENTS_CLEAR_SEARCH",
+                path: "/app/admin/students",
+                method: "CLIENT"
+            });
+        }
     };
 
     return (

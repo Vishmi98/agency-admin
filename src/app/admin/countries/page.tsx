@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Box, Button, Typography } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import { useTheme } from '@mui/material/styles';
@@ -9,22 +9,53 @@ import { useRouter } from 'next/navigation';
 import CountriesTable from '@/modules/countries/ui/Countries';
 import AddCountryModal from '@/modules/countries/ui/AddCountryModal';
 import { getCookieUser } from '@/utils/cookie.util';
+import { logActivity } from '@/utils/logActivity';
 
 
 const CountriesPage = () => {
     const [open, setOpen] = useState(false);
     const [reloadTable, setReloadTable] = useState(false);
     const theme = useTheme();
-    const user = getCookieUser()
+    const user = useMemo(() => getCookieUser(), []);
+    const didFetch = useRef(false);
     const router = useRouter();
 
     useEffect(() => {
         if (!user) {
             router.push('/');
+            return;
         }
-    }, [user, router]);
 
-    const handleClickOpen = () => setOpen(true);
+        if (didFetch.current) return;
+        didFetch.current = true;
+
+        // 📌 PAGE VIEW LOG
+        logActivity({
+            userId: user.id,
+            action: "COUNTRIES_PAGE_VIEW",
+            path: "/app/admin/countries",
+            method: "CLIENT",
+        });
+
+    }, []);
+
+    const handleClickOpen = () => {
+        setOpen(true);
+
+        if (user) {
+            // 📌 BUTTON CLICK LOG
+            logActivity({
+                userId: user.id,
+                action: "ADD_COUNTRY_BUTTON_CLICK",
+                path: "/app/admin/countries",
+                method: "CLIENT",
+                meta: {
+                    source: "CountriesPageHeaderButton"
+                }
+            });
+        }
+    };
+
     const handleClose = () => setOpen(false);
 
     const handleReload = () => {

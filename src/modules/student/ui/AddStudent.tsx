@@ -23,10 +23,13 @@ import TextBox from "@/components/TextBox";
 import { DropdownType } from "@/type/common.types";
 import { getBranches, getStaffData, getTitles } from "@/modules/staff/services/staff.services";
 import { StaffDataType } from "@/modules/staff/staff.types";
+import { getCookieUser } from "@/utils/cookie.util";
+import { logActivity } from "@/utils/logActivity";
 
 
 const AddStudent = () => {
     const theme = useTheme();
+    const user = getCookieUser();
 
     const router = useRouter();
 
@@ -57,6 +60,15 @@ const AddStudent = () => {
 
     useEffect(() => {
         fetchDropdownData();
+
+        if (user) {
+            logActivity({
+                userId: user.id,
+                action: "STUDENT_ADD_PAGE_VIEW",
+                path: "/modules/student/ui/AddStudent",
+                method: "CLIENT",
+            });
+        }
     }, []);
 
     const handleSubmit = async (
@@ -81,6 +93,20 @@ const AddStudent = () => {
             }
 
             toast.success(response.message);
+
+            if (user) {
+                logActivity({
+                    userId: user.id,
+                    action: "STUDENT_CREATED",
+                    path: "/modules/student/ui/AddStudent",
+                    method: "CLIENT",
+                    endpoint: "/api/auth/create_new",
+                    meta: {
+                        studentEmail: updatedValues.email,
+                    }
+                });
+            }
+
             resetForm();
             router.push('/admin/students')
         } catch (error) {
@@ -88,6 +114,17 @@ const AddStudent = () => {
             console.log(error);
         } finally {
             setIsLoading(false);
+        }
+    };
+
+    const handleCancel = () => {
+        if (user) {
+            logActivity({
+                userId: user.id,
+                action: "STUDENT_ADD_CANCEL",
+                path: "/modules/student/ui/AddStudent",
+                method: "CLIENT",
+            });
         }
     };
 
@@ -366,6 +403,7 @@ const AddStudent = () => {
                         >
                             <Button
                                 color="secondary"
+                                onClick={handleCancel}
                                 sx={{
                                     backgroundColor: "#f5f5f5",
                                     color: "#555",

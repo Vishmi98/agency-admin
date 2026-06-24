@@ -17,6 +17,8 @@ import CloseIcon from "@mui/icons-material/Close";
 
 import { LeadDataType, LeadStatusDataType } from "../leads.types";
 import { updateInvoiceStatus, getLeadStatuses } from "../leads.service";
+import { getCookieUser } from "@/utils/cookie.util";
+import { logActivity } from "@/utils/logActivity";
 
 interface Props {
     open: boolean;
@@ -35,13 +37,28 @@ const LeadStatusModal: React.FC<Props> = ({
     const [loading, setLoading] = useState(false);
     const [fetching, setFetching] = useState(false);
     const [statusList, setStatusList] = useState<LeadStatusDataType[]>([]);
+    const user = getCookieUser();
 
     // set current lead status
     useEffect(() => {
         if (lead?.status) {
             setStatus(lead.status);
         }
-    }, [lead]);
+
+        if (open && user && lead) {
+            logActivity({
+                userId: user.id,
+                action: "LEAD_STATUS_MODAL_OPEN",
+                path: "/modules/leads/ui/LeadStatusModal",
+                method: "CLIENT",
+                meta: {
+                    leadId: lead.id,
+                    currentStatus: lead.status,
+                }
+            });
+        }
+    }, [lead, open]);
+
 
     // load statuses
     useEffect(() => {
@@ -74,6 +91,8 @@ const LeadStatusModal: React.FC<Props> = ({
         try {
             setLoading(true);
 
+            const previousStatus = lead.status;
+
             const res = await updateInvoiceStatus(
                 lead.id,
                 status
@@ -81,6 +100,22 @@ const LeadStatusModal: React.FC<Props> = ({
 
             if (res.success) {
                 toast.success(res.message);
+
+                if (user) {
+                    logActivity({
+                        userId: user.id,
+                        action: "LEAD_STATUS_UPDATED",
+                        path: "/modules/leads/ui/LeadStatusModal",
+                        endpoint: "/api/lead/update-status",
+                        method: "POST",
+                        meta: {
+                            leadId: lead.id,
+                            from: previousStatus,
+                            to: status,
+                        }
+                    });
+                }
+
                 onSuccess();
                 onClose();
             } else {
@@ -91,6 +126,22 @@ const LeadStatusModal: React.FC<Props> = ({
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleClose = () => {
+        if (user && lead) {
+            logActivity({
+                userId: user.id,
+                action: "LEAD_STATUS_MODAL_CANCEL",
+                path: "/modules/leads/ui/LeadStatusModal",
+                method: "CLIENT",
+                meta: {
+                    leadId: lead.id,
+                }
+            });
+        }
+
+        onClose();
     };
 
     return (
@@ -163,7 +214,7 @@ const LeadStatusModal: React.FC<Props> = ({
                 }}
             >
                 <Button
-                    onClick={onClose}
+                    onClick={handleClose}
                     color="secondary"
                     sx={{
                         backgroundColor: "#f5f5f5",

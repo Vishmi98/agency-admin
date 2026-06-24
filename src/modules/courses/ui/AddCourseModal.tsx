@@ -9,13 +9,12 @@ import {
     DialogActions,
     DialogContent,
     DialogTitle,
-    FormControl,
     Grid,
     TextField,
     Typography,
     useTheme,
 } from "@mui/material";
-import { Formik, Form, FormikProps, Field, ErrorMessage, FieldArray } from "formik";
+import { Formik, Form, FormikProps, Field, FieldArray } from "formik";
 import { toast, ToastContainer } from "react-toastify";
 import CloseIcon from '@mui/icons-material/Close';
 
@@ -27,10 +26,13 @@ import TextBox from "@/components/TextBox";
 import { getUniversityData } from "@/modules/university/services/university.services";
 import { AddModalProps } from "@/modules/countries/countries.types";
 import { UniversityDataType } from "@/modules/university/university.types";
+import { getCookieUser } from "@/utils/cookie.util";
+import { logActivity } from "@/utils/logActivity";
 
 
 const AddCourseModal: FC<AddModalProps> = ({ isOpen, onClose, handleReload }) => {
     const theme = useTheme();
+    const user = getCookieUser();
 
     const [universities, setUniversities] = useState<UniversityDataType[]>([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -48,7 +50,18 @@ const AddCourseModal: FC<AddModalProps> = ({ isOpen, onClose, handleReload }) =>
     };
 
     useEffect(() => {
-        if (isOpen) fetchData();
+        if (isOpen) {
+            fetchData();
+
+            if (user) {
+                logActivity({
+                    userId: user.id,
+                    action: "ADD_COURSE_MODAL_OPEN",
+                    path: "/modules/courses/ui/AddCourseModal",
+                    method: "CLIENT",
+                });
+            }
+        }
     }, [isOpen]);
 
     const handleSubmit = async (
@@ -62,6 +75,20 @@ const AddCourseModal: FC<AddModalProps> = ({ isOpen, onClose, handleReload }) =>
 
             if (response.success) {
                 toast.success(response.message);
+
+                if (user) {
+                    logActivity({
+                        userId: user.id,
+                        action: "COURSE_CREATED_SUCCESS",
+                        path: "/modules/courses/ui/AddCourseModal",
+                        endpoint: "/api/course/create",
+                        method: "POST",
+                        meta: {
+                            course: values.title,
+                        }
+                    });
+                }
+
                 handleReload();
                 onClose();
                 resetForm();
@@ -96,15 +123,45 @@ const AddCourseModal: FC<AddModalProps> = ({ isOpen, onClose, handleReload }) =>
         const [input, setInput] = useState("");
 
         const handleAdd = () => {
-            if (!input.trim()) return;
+            const trimmed = input.trim();
+            if (!trimmed) return;
 
-            setFieldValue(fieldName, [...value, input.trim()]);
+            const updated = [...value, trimmed];
+            setFieldValue(fieldName, updated);
             setInput("");
+
+            if (user) {
+                logActivity({
+                    userId: user.id,
+                    action: "ARRAY_ITEM_ADD",
+                    path: "/modules/courses/ui/AddCourseModal",
+                    method: "CLIENT",
+                    meta: {
+                        field: fieldName,
+                        value: trimmed
+                    }
+                });
+            }
         };
 
         const handleRemove = (index: number) => {
+            const removedItem = value[index];
             const updated = value.filter((_, i) => i !== index);
+
             setFieldValue(fieldName, updated);
+
+            if (user) {
+                logActivity({
+                    userId: user.id,
+                    action: "ARRAY_ITEM_REMOVE",
+                    path: "/modules/courses/ui/AddCourseModal",
+                    method: "CLIENT",
+                    meta: {
+                        field: fieldName,
+                        removedValue: removedItem
+                    }
+                });
+            }
         };
 
         return (
@@ -410,7 +467,20 @@ const AddCourseModal: FC<AddModalProps> = ({ isOpen, onClose, handleReload }) =>
                                                                         variant="outlined"
                                                                         color="error"
                                                                         size="small"
-                                                                        onClick={() => remove(index)}
+                                                                        onClick={() => {
+                                                                            remove(index);
+
+                                                                            // ✅ LOG REMOVE ACTION
+                                                                            if (user) {
+                                                                                logActivity({
+                                                                                    userId: user.id,
+                                                                                    action: "REMOVE_ENGLISH_REQUIREMENT_ROW",
+                                                                                    path: "/modules/courses/ui/AddCourseModal",
+                                                                                    method: "CLIENT",
+                                                                                    meta: { index },
+                                                                                });
+                                                                            }
+                                                                        }}
                                                                         sx={{ fontSize: "12px" }}
                                                                     >
                                                                         Remove
@@ -431,13 +501,23 @@ const AddCourseModal: FC<AddModalProps> = ({ isOpen, onClose, handleReload }) =>
                                                             variant="contained"
                                                             size="small"
                                                             sx={{ fontSize: "12px" }}
-                                                            onClick={() =>
+                                                            onClick={() => {
                                                                 push({
                                                                     test: "",
                                                                     overallScore: 0,
                                                                     minimumBand: 0,
-                                                                })
-                                                            }
+                                                                });
+
+                                                                // ✅ LOG ADD ACTION
+                                                                if (user) {
+                                                                    logActivity({
+                                                                        userId: user.id,
+                                                                        action: "ADD_ENGLISH_REQUIREMENT_ROW",
+                                                                        path: "/modules/courses/ui/AddCourseModal",
+                                                                        method: "CLIENT",
+                                                                    });
+                                                                }
+                                                            }}
                                                         >
                                                             Add
                                                         </Button>
@@ -541,7 +621,18 @@ const AddCourseModal: FC<AddModalProps> = ({ isOpen, onClose, handleReload }) =>
                                 }}
                             >
                                 <Button
-                                    onClick={onClose}
+                                    onClick={() => {
+                                        onClose();
+
+                                        if (user) {
+                                            logActivity({
+                                                userId: user.id,
+                                                action: "ADD_COURSE_CANCEL",
+                                                path: "/modules/courses/ui/AddCourseModal",
+                                                method: "CLIENT",
+                                            });
+                                        }
+                                    }}
                                     color="secondary"
                                     sx={{
                                         backgroundColor: "#f5f5f5",

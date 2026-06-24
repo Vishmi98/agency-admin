@@ -12,10 +12,13 @@ import { addStudentValidationSchema } from '../student.utils';
 import { DropdownType } from '@/type/common.types';
 import { getTitles } from '@/modules/staff/services/staff.services';
 import TextBox from '@/components/TextBox';
+import { getCookieUser } from '@/utils/cookie.util';
+import { logActivity } from '@/utils/logActivity';
 
 
 const EditStudentModal: React.FC<EditStudentModalProps> = ({ isOpen, onClose, initialValues, reloadData }) => {
     const theme = useTheme();
+    const user = getCookieUser();
 
     const [titles, setTitles] = useState<DropdownType[]>([]);
     const [visaStatuses, setVisaStatuses] = useState<DropdownType[]>([]);
@@ -35,8 +38,19 @@ const EditStudentModal: React.FC<EditStudentModalProps> = ({ isOpen, onClose, in
     };
 
     useEffect(() => {
-        fetchDropdownData();
-    }, []);
+        if (isOpen) {
+            fetchDropdownData();
+
+            if (user) {
+                logActivity({
+                    userId: user.id,
+                    action: "EDIT_STUDENT_MODAL_OPEN",
+                    path: "/modules/student/ui/EditStudentModal",
+                    method: "CLIENT",
+                });
+            }
+        }
+    }, [isOpen]);
 
     const handleSubmit = async (
         values: StudentType,
@@ -47,6 +61,20 @@ const EditStudentModal: React.FC<EditStudentModalProps> = ({ isOpen, onClose, in
 
             if (response.success) {
                 toast.success(response.message || "Student updated successfully!");
+
+                if (user) {
+                    logActivity({
+                        userId: user.id,
+                        action: "STUDENT_UPDATED_SUCCESS",
+                        path: "/modules/student/ui/EditStudentModal",
+                        endpoint: "/api/student/update",
+                        method: "POST",
+                        meta: {
+                            student: values.fullName,
+                        }
+                    });
+                }
+
                 reloadData();
                 resetForm();
                 onClose();
@@ -318,7 +346,18 @@ const EditStudentModal: React.FC<EditStudentModalProps> = ({ isOpen, onClose, in
                                         "&:hover": { backgroundColor: "#e0e0e0" },
                                         width: "200px"
                                     }}
-                                    onClick={onClose}
+                                    onClick={() => {
+                                        onClose();
+
+                                        if (user) {
+                                            logActivity({
+                                                userId: user.id,
+                                                action: "UPDATE_STUDENT_CANCEL",
+                                                path: "/modules/student/ui/EditStudentModal",
+                                                method: "CLIENT",
+                                            });
+                                        }
+                                    }}
                                 >
                                     Cancel
                                 </Button>

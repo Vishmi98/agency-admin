@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Button, Box, Typography, useTheme } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import { useRouter } from 'next/navigation';
@@ -8,22 +8,53 @@ import { useRouter } from 'next/navigation';
 import UniversitiesTable from '@/modules/university/ui/UniversitiesTable';
 import AddUniversityModal from '@/modules/university/ui/AddUniversityModal';
 import { getCookieUser } from '@/utils/cookie.util';
+import { logActivity } from '@/utils/logActivity';
 
 
 const UniversitiesPage = () => {
     const [open, setOpen] = useState(false);
     const [reloadTable, setReloadTable] = useState(false);
     const theme = useTheme();
-    const user = getCookieUser()
+    const user = useMemo(() => getCookieUser(), []);
+    const didFetch = useRef(false);
     const router = useRouter();
 
     useEffect(() => {
         if (!user) {
             router.push('/');
+            return;
         }
-    }, [user, router]);
 
-    const handleClickOpen = () => setOpen(true);
+        if (didFetch.current) return;
+        didFetch.current = true;
+
+        // 📌 PAGE VIEW LOG
+        logActivity({
+            userId: user.id,
+            action: "UNIVERSITIES_PAGE_VIEW",
+            path: "/app/admin/universities",
+            method: "CLIENT",
+        });
+
+    }, []);
+
+    const handleClickOpen = () => {
+        setOpen(true);
+
+        if (user) {
+            // 📌 BUTTON CLICK LOG
+            logActivity({
+                userId: user.id,
+                action: "ADD_UNIVERSITY_BUTTON_CLICK",
+                path: "/app/admin/universities",
+                method: "CLIENT",
+                meta: {
+                    source: "UniversitiesPageHeaderButton"
+                }
+            });
+        }
+    };
+
     const handleClose = () => setOpen(false);
 
     const handleReload = () => {

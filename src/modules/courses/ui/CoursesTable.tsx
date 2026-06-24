@@ -10,6 +10,9 @@ import Course from './Course';
 import { CourseDataType, CourseTableProps } from '../courses.types';
 import EditCourseModal from './EditCourseModal';
 
+import { getCookieUser } from '@/utils/cookie.util';
+import { logActivity } from '@/utils/logActivity';
+
 
 const CoursesTable: React.FC<CourseTableProps> = ({
     totalRows,
@@ -26,6 +29,7 @@ const CoursesTable: React.FC<CourseTableProps> = ({
     const [expandedRows, setExpandedRows] = useState<number[]>([]);
     const [openEditModal, setOpenEditModal] = useState(false);
     const [openPreviewModal, setOpenPreviewModal] = useState(false);
+    const user = getCookieUser()
 
     const columns = [
         { label: "Course ID", key: "id", width: "10%", align: "center" as const },
@@ -43,16 +47,42 @@ const CoursesTable: React.FC<CourseTableProps> = ({
                 ? prev.filter((id) => id !== courseId)
                 : [...prev, courseId]
         );
+
+        logActivity({
+            userId: user ? user.id : 0,
+            action: "COURSE_ROW_EXPAND",
+            path: "/modules/courses/ui/CoursesTable",
+            method: "CLIENT",
+            meta: {
+                courseId
+            }
+        });
     };
 
     const handleEditClick = (course: CourseDataType) => {
         setSelectedCourse(course);
         setOpenEditModal(true);
+
+        logActivity({
+            userId: user ? user.id : 0,
+            action: "EDIT_COURSE_CLICK",
+            path: "/modules/courses/ui/CoursesTable",
+            method: "CLIENT",
+            meta: { courseID: course.id },
+        });
     };
 
     const handlePreviewClick = (course: CourseDataType) => {
         setSelectedCourse(course);
         setOpenPreviewModal(true);
+
+        logActivity({
+            userId: user ? user.id : 0,
+            action: "PREVIEW_COURSE_CLICK",
+            path: "/modules/courses/ui/CoursesTable",
+            method: "CLIENT",
+            meta: { courseID: course.id },
+        });
     };
 
     const expandedContent = (course: CourseDataType) => (
@@ -291,17 +321,17 @@ const CoursesTable: React.FC<CourseTableProps> = ({
                     </TableCell>
 
                     <TableCell>
-                        <IconButton onClick={() => handleEditClick(course)}>
-                            <EditIcon fontSize="small" />
-                        </IconButton>
+                        {user && user.roll === 1 && (
+                            <IconButton onClick={() => handleEditClick(course)}>
+                                <EditIcon fontSize="small" />
+                            </IconButton>
+                        )}
                     </TableCell>
-
                     <TableCell align="right">
                         <IconButton onClick={() => handlePreviewClick(course)}>
                             <RemoveRedEyeIcon fontSize="small" />
                         </IconButton>
                     </TableCell>
-
                     <TableCell align="center">
                         <IconButton
                             size="small"

@@ -7,6 +7,7 @@ import StaffModel from "@/models/office/staff.model";
 import { generateAdminToken } from "@/utils/jwt";
 import { decryptData } from "@/lib/decrypt";
 import { encryptData } from "@/lib/encrypt";
+import { createActivityLog } from "@/utils/createActivityLog";
 
 
 export async function POST(req: NextRequest) {
@@ -47,6 +48,18 @@ export async function POST(req: NextRequest) {
 
         const encryptedResponse = encryptData({
             token,
+        });
+
+        await createActivityLog({
+            userId: user.id,
+            action: "STAFF_LOGIN_SUCCESS",
+            endpoint: "/api/auth/login-staff",
+            method: "POST",
+            meta: {
+                email: user.email,
+                roll: user.roll,
+                time: new Date().toISOString()
+            }
         });
 
         return sendSuccessResponse(

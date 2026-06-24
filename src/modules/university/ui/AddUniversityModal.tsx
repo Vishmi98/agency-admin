@@ -25,11 +25,11 @@ import { DropdownType } from "@/type/common.types";
 import { getCookieUser } from "@/utils/cookie.util";
 import { getCountriesData } from "@/modules/countries/services/countries.services";
 import { AddModalProps } from "@/modules/countries/countries.types";
+import { logActivity } from "@/utils/logActivity";
 
 
 const AddUniversityModal: FC<AddModalProps> = ({ isOpen, onClose, handleReload }) => {
     const theme = useTheme();
-    
     const user = getCookieUser();
 
     const [countries, setCountries] = useState<DropdownType[]>([]);
@@ -50,6 +50,15 @@ const AddUniversityModal: FC<AddModalProps> = ({ isOpen, onClose, handleReload }
 
         if (isOpen) {
             fetchCountries();
+
+            if (user) {
+                logActivity({
+                    userId: user.id,
+                    action: "ADD_UNIVERSITY_MODAL_OPEN",
+                    path: "/modules/university/ui/AddUniversityModal",
+                    method: "CLIENT",
+                });
+            }
         }
     }, [isOpen]);
 
@@ -63,6 +72,20 @@ const AddUniversityModal: FC<AddModalProps> = ({ isOpen, onClose, handleReload }
             const response = await createUniversity(values);
             if (response.success) {
                 toast.success(response.message);
+
+                if (user) {
+                    logActivity({
+                        userId: user.id,
+                        action: "UNIVERSITY_CREATED_SUCCESS",
+                        path: "/modules/university/ui/AddUniversityModal",
+                        endpoint: "/api/university/create",
+                        method: "POST",
+                        meta: {
+                            university: values.name,
+                        }
+                    });
+                }
+
                 handleReload();
                 onClose();
                 resetForm();
@@ -226,7 +249,18 @@ const AddUniversityModal: FC<AddModalProps> = ({ isOpen, onClose, handleReload }
                                 }}
                             >
                                 <Button
-                                    onClick={onClose}
+                                    onClick={() => {
+                                        onClose();
+
+                                        if (user) {
+                                            logActivity({
+                                                userId: user.id,
+                                                action: "ADD_UNIVERSITY_CANCEL",
+                                                path: "/modules/university/ui/AddUniversityModal",
+                                                method: "CLIENT",
+                                            });
+                                        }
+                                    }}
                                     color="secondary"
                                     sx={{
                                         backgroundColor: "#f5f5f5",

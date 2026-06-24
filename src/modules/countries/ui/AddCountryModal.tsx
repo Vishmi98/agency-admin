@@ -22,10 +22,13 @@ import { createCountrySliderData } from "../services/countries.services";
 
 import TextBox from "@/components/TextBox";
 import { addDropdownInitialValues, addDropdownValidationSchema } from "@/modules/expensesTypes/expensesTypes.utils";
+import { getCookieUser } from "@/utils/cookie.util";
+import { logActivity } from "@/utils/logActivity";
 
 
 const AddCountryModal: FC<AddModalProps> = ({ isOpen, onClose, handleReload }) => {
     const theme = useTheme();
+    const user = getCookieUser();
 
     const handleSubmit = async (
         values: { title: string },
@@ -35,6 +38,20 @@ const AddCountryModal: FC<AddModalProps> = ({ isOpen, onClose, handleReload }) =
             const response = await createCountrySliderData(values.title);
             if (response.success) {
                 toast.success(response.message);
+
+                if (user) {
+                    logActivity({
+                        userId: user.id,
+                        action: "COUNTRY_CREATED_SUCCESS",
+                        path: "/modules/countries/ui/AddCountryModal",
+                        endpoint: "/api/country/create",
+                        method: "POST",
+                        meta: {
+                            country: values.title,
+                        }
+                    });
+                }
+
                 handleReload();
                 onClose();
                 resetForm();
@@ -115,7 +132,18 @@ const AddCountryModal: FC<AddModalProps> = ({ isOpen, onClose, handleReload }) =
                                 }}
                             >
                                 <Button
-                                    onClick={onClose}
+                                    onClick={() => {
+                                        onClose();
+
+                                        if (user) {
+                                            logActivity({
+                                                userId: user.id,
+                                                action: "ADD_COUNTRY_CANCEL",
+                                                path: "/modules/countries/ui/AddCountryModal",
+                                                method: "CLIENT",
+                                            });
+                                        }
+                                    }}
                                     color="secondary"
                                     sx={{
                                         backgroundColor: "#f5f5f5",

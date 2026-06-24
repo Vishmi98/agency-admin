@@ -32,6 +32,8 @@ import { StaffDataType, StaffTableProps } from '../staff.types';
 import { activeStaffMember, addStaffPassword } from '../services/staff.services';
 
 import { TableColumnType } from '@/type/common.types';
+import { getCookieUser } from '@/utils/cookie.util';
+import { logActivity } from '@/utils/logActivity';
 
 
 const columns: TableColumnType[] = [
@@ -42,7 +44,7 @@ const columns: TableColumnType[] = [
   { label: "Address", width: "25%", align: "left" },
   { label: "", width: "5%", align: "center" },
   { label: "", width: "5%", align: "center" },
-  { label: "Active", width: "5%", align: "right" },
+  { label: "", width: "5%", align: "right" },
 ];
 
 const StaffTable: React.FC<StaffTableProps> = ({
@@ -58,6 +60,7 @@ const StaffTable: React.FC<StaffTableProps> = ({
   reloadData
 }) => {
   const theme = useTheme();
+  const user = getCookieUser()
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loadingStaffId, setLoadingStaffId] = useState<number | null>(null);
@@ -78,6 +81,15 @@ const StaffTable: React.FC<StaffTableProps> = ({
 
       if (response.success) {
         toast.success(response.success);
+
+        logActivity({
+          userId: user ? user.id : 0,
+          action: "STAFF_STATUS_UPDATED",
+          path: "/modules/staff/ui/StaffTable",
+          method: "CLIENT",
+          meta: { staffId, newValue: !currentValue },
+        });
+
         reloadData();
       } else {
         toast.error(response.message)
@@ -94,16 +106,39 @@ const StaffTable: React.FC<StaffTableProps> = ({
     setSelectedStaffId(staffId);
     setSelectedStaffStatus(currentValue);
     setIsModalOpen(true);
+
+    logActivity({
+      userId: user ? user.id : 0,
+      action: "STAFF_STATUS_MODAL_OPEN",
+      path: "/modules/staff/ui/StaffTable",
+      method: "CLIENT",
+      meta: { staffId, currentValue },
+    });
   };
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setSelectedStaffId(null);
+
+    logActivity({
+      userId: user ? user.id : 0,
+      action: "STAFF_STATUS_MODAL_CLOSE",
+      path: "/modules/staff/ui/StaffTable",
+      method: "CLIENT"
+    });
   };
 
   const handleEditClick = (staff: StaffDataType) => {
     setSelectedStaff(staff);
     setOpenEditModal(true);
+
+    logActivity({
+      userId: user ? user.id : 0,
+      action: "EDIT_STAFF_CLICK",
+      path: "/modules/staff/ui/StaffTable",
+      method: "CLIENT",
+      meta: { staffId: staff.id },
+    });
   };
 
   // 🔹 Open Password Modal
@@ -111,12 +146,27 @@ const StaffTable: React.FC<StaffTableProps> = ({
     setSelectedStaffId(staffId);
     setPasswordInput("");
     setOpenPasswordModal(true);
+
+    logActivity({
+      userId: user ? user.id : 0,
+      action: "STAFF_PASSWORD_MODAL_OPEN",
+      path: "/modules/staff/ui/StaffTable",
+      method: "CLIENT",
+      meta: { staffId },
+    });
   };
 
   const handleClosePasswordModal = () => {
     setOpenPasswordModal(false);
     setSelectedStaffId(null);
     setPasswordInput("");
+
+    logActivity({
+      userId: user ? user.id : 0,
+      action: "STAFF_PASSWORD_MODAL_CLOSE",
+      path: "/modules/staff/ui/StaffTable",
+      method: "CLIENT"
+    });
   };
 
   const handleSubmitPassword = async () => {
@@ -133,6 +183,15 @@ const StaffTable: React.FC<StaffTableProps> = ({
 
       if (response.success) {
         toast.success(response.message);
+
+        logActivity({
+          userId: user ? user.id : 0,
+          action: "STAFF_PASSWORD_UPDATED",
+          path: "/modules/staff/ui/StaffTable",
+          method: "CLIENT",
+          meta: { staffId: selectedStaffId },
+        });
+
         handleClosePasswordModal();
       } else {
         toast.error(response.message);
@@ -183,25 +242,11 @@ const StaffTable: React.FC<StaffTableProps> = ({
           {(() => {
             switch (member.roll) {
               case 1:
-                return "Admin";
+                return "Super Admin";
               case 2:
-                return "Consultant";
+                return "SL Team";
               case 3:
-                return "HR";
-              case 4:
-                return "Accounts";
-              case 5:
-                return "CEO";
-              case 6:
-                return "Marketing Manager";
-              case 7:
-                return "Branch Manager";
-              case 8:
-                return "Operation Manager";
-              case 9:
-                return "Coordinator";
-              case 10:
-                return "Junior Consultant";
+                return "NZ Team";
               default:
                 return "";
             }
@@ -209,22 +254,28 @@ const StaffTable: React.FC<StaffTableProps> = ({
         </TableCell>
         <TableCell>{member.address}</TableCell>
         <TableCell>
-          <Button variant="outlined" size='small' sx={{ fontSize: "8px" }} onClick={() => handleOpenPasswordModal(member.id)}>
-            Change password
-          </Button>
+          {user && user.roll === 1 && (
+            <Button variant="outlined" size='small' sx={{ fontSize: "8px" }} onClick={() => handleOpenPasswordModal(member.id)}>
+              Change password
+            </Button>
+          )}
         </TableCell>
         <TableCell>
-          <IconButton onClick={() => handleEditClick(member)}>
-            <EditIcon fontSize="small" />
-          </IconButton>
+          {user && user.roll === 1 && (
+            <IconButton onClick={() => handleEditClick(member)}>
+              <EditIcon fontSize="small" />
+            </IconButton>
+          )}
         </TableCell>
         <TableCell align="right">
-          <Switch
-            checked={member.isActive}
-            onChange={() => handleOpenModal(member.id, member.isActive)}
-            size="small"
-            color="primary"
-          />
+          {user && user.roll === 1 && (
+            <Switch
+              checked={member.isActive}
+              onChange={() => handleOpenModal(member.id, member.isActive)}
+              size="small"
+              color="primary"
+            />
+          )}
         </TableCell>
       </TableRow>
     ));

@@ -17,8 +17,11 @@ import {
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
-import { LeadDataType, LeadsTableProps } from "../leads.types";
 import LeadStatusModal from "./LeadStatusModal";
+import { LeadDataType, LeadsTableProps } from "../leads.types";
+
+import { getCookieUser } from "@/utils/cookie.util";
+import { logActivity } from "@/utils/logActivity";
 
 const LeadsTable: React.FC<LeadsTableProps> = ({
     totalRows,
@@ -32,6 +35,7 @@ const LeadsTable: React.FC<LeadsTableProps> = ({
     const [expandedRows, setExpandedRows] = useState<number[]>([]);
     const [statusModalOpen, setStatusModalOpen] = useState(false);
     const [selectedLead, setSelectedLead] = useState<LeadDataType | null>(null);
+    const user = getCookieUser()
 
     const columns = [
         { label: "Lead ID", key: "id", width: "5%", align: "center" as const },
@@ -48,6 +52,16 @@ const LeadsTable: React.FC<LeadsTableProps> = ({
                 ? prev.filter((id) => id !== leadId)
                 : [...prev, leadId]
         );
+
+        logActivity({
+            userId: user ? user.id : 0,
+            action: "LEAD_ROW_EXPAND",
+            path: "/modules/leads/ui/LeadsTable",
+            method: "CLIENT",
+            meta: {
+                leadId
+            }
+        });
     };
 
     const expandedContent = (lead: LeadDataType) => (
@@ -189,14 +203,28 @@ const LeadsTable: React.FC<LeadsTableProps> = ({
                             `${lead.staffInfo?.firstName || ""} ${lead.staffInfo?.lastName || ""
                             }`}
                     </TableCell>
-
                     {/* Status */}
                     <TableCell align="center">
                         <Box
-                            onClick={() => {
-                                setSelectedLead(lead);
-                                setStatusModalOpen(true);
-                            }}
+                            onClick={
+                                user && user?.roll === 1
+                                    ? () => {
+                                        setSelectedLead(lead);
+                                        setStatusModalOpen(true);
+
+                                        logActivity({
+                                            userId: user.id,
+                                            action: "LEAD_STATUS_CLICK",
+                                            path: "/modules/leads/ui/LeadsTable",
+                                            method: "CLIENT",
+                                            meta: {
+                                                leadId: lead.id,
+                                                currentStatus: lead.statusInfo?.title?.EN
+                                            }
+                                        });
+                                    }
+                                    : undefined
+                            }
                             sx={{
                                 backgroundColor: lead.statusInfo?.color || "#1976d2",
                                 color: "#fff",
@@ -208,13 +236,12 @@ const LeadsTable: React.FC<LeadsTableProps> = ({
                                 minWidth: 80,
                                 textAlign: "center",
                                 display: "inline-block",
-                                cursor: "pointer",
+                                cursor: user && user?.roll === 1 ? "pointer" : "default",
                             }}
                         >
                             {lead.statusInfo?.title?.EN || "-"}
                         </Box>
                     </TableCell>
-
                     {/* Expand */}
                     <TableCell align="center">
                         <IconButton
@@ -233,20 +260,22 @@ const LeadsTable: React.FC<LeadsTableProps> = ({
                     </TableCell>
                 </TableRow>
 
-                {expandedRows.includes(lead.id) && (
-                    <TableRow>
-                        <TableCell
-                            colSpan={columns.length}
-                            sx={{
-                                backgroundColor: "#f8fafc",
-                                p: 0,
-                            }}
-                        >
-                            {expandedContent(lead)}
-                        </TableCell>
-                    </TableRow>
-                )}
-            </React.Fragment>
+                {
+                    expandedRows.includes(lead.id) && (
+                        <TableRow>
+                            <TableCell
+                                colSpan={columns.length}
+                                sx={{
+                                    backgroundColor: "#f8fafc",
+                                    p: 0,
+                                }}
+                            >
+                                {expandedContent(lead)}
+                            </TableCell>
+                        </TableRow>
+                    )
+                }
+            </React.Fragment >
         ));
     };
 

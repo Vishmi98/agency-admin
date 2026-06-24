@@ -21,6 +21,8 @@ import { getUniversityData } from "../services/university.services";
 import { UniversityDataType } from "../university.types";
 
 import { TableProps } from "@/modules/countries/countries.types";
+import { getCookieUser } from "@/utils/cookie.util";
+import { logActivity } from "@/utils/logActivity";
 
 
 const UniversitiesTable: React.FC<TableProps> = ({ reload }) => {
@@ -31,6 +33,7 @@ const UniversitiesTable: React.FC<TableProps> = ({ reload }) => {
   const [limit, setLimit] = useState(5);
   const [totalRows, setTotalRows] = useState(0);
   const [openEditModal, setOpenEditModal] = useState(false);
+  const user = getCookieUser()
 
   const fetchUniversityData = async (pramPage?: number) => {
     setIsLoading(true);
@@ -67,6 +70,14 @@ const UniversitiesTable: React.FC<TableProps> = ({ reload }) => {
   const handleEditClick = (uni: UniversityDataType) => {
     setSelectedUni(uni);
     setOpenEditModal(true);
+
+    logActivity({
+      userId: user ? user.id : 0,
+      action: "EDIT_UNIVERSITY_CLICK",
+      endpoint: "/modules/university/ui/UniversitiesTable",
+      method: "CLIENT",
+      meta: { uniId: uni.id },
+    });
   };
 
   const handleCloseModal = () => {
@@ -150,9 +161,11 @@ const UniversitiesTable: React.FC<TableProps> = ({ reload }) => {
             case "edit":
               return (
                 <TableCell key={col.key} align={col.align}>
-                  <IconButton onClick={() => handleEditClick(uni)}>
-                    <EditIcon fontSize="small" />
-                  </IconButton>
+                  {user && user.roll === 1 && (
+                    <IconButton onClick={() => handleEditClick(uni)}>
+                      <EditIcon fontSize="small" />
+                    </IconButton>
+                  )}
                 </TableCell>
               );
 

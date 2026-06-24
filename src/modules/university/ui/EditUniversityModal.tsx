@@ -24,11 +24,11 @@ import TextBox from "@/components/TextBox";
 import { DropdownType } from "@/type/common.types";
 import { getCookieUser } from "@/utils/cookie.util";
 import { getCountriesData } from "@/modules/countries/services/countries.services";
+import { logActivity } from "@/utils/logActivity";
 
 
 const EditUniversityModal: React.FC<EditUniversityModalProps> = ({ isOpen, onClose, initialValues, reloadData }) => {
     const theme = useTheme();
-
     const user = getCookieUser();
 
     const [countries, setCountries] = useState<DropdownType[]>([]);
@@ -49,6 +49,15 @@ const EditUniversityModal: React.FC<EditUniversityModalProps> = ({ isOpen, onClo
 
         if (isOpen) {
             fetchCountries();
+
+            if (user) {
+                logActivity({
+                    userId: user.id,
+                    action: "EDIT_UNIVERSITY_MODAL_OPEN",
+                    path: "/modules/university/ui/EditUniversityModal",
+                    method: "CLIENT",
+                });
+            }
         }
     }, [isOpen]);
 
@@ -58,6 +67,20 @@ const EditUniversityModal: React.FC<EditUniversityModalProps> = ({ isOpen, onClo
 
             if (response.success) {
                 toast.success(response.message);
+
+                if (user) {
+                    logActivity({
+                        userId: user.id,
+                        action: "UNIVERSITY_EDITED_SUCCESS",
+                        path: "/modules/university/ui/EditUniversityModal",
+                        endpoint: "/api/university/update",
+                        method: "POST",
+                        meta: {
+                            university: values.name,
+                        }
+                    });
+                }
+
                 reloadData();
                 onClose();
                 resetForm();
@@ -223,7 +246,18 @@ const EditUniversityModal: React.FC<EditUniversityModalProps> = ({ isOpen, onClo
                                 }}
                             >
                                 <Button
-                                    onClick={onClose}
+                                    onClick={() => {
+                                        onClose();
+
+                                        if (user) {
+                                            logActivity({
+                                                userId: user.id,
+                                                action: "EDIT_UNIVERSITY_CANCEL",
+                                                path: "/modules/university/ui/EditUniversityModal",
+                                                method: "CLIENT",
+                                            });
+                                        }
+                                    }}
                                     color="secondary"
                                     sx={{
                                         backgroundColor: "#f5f5f5",

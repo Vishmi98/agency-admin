@@ -23,10 +23,13 @@ import { getBranches, getGenders, getTitles, updateStaff } from "../services/sta
 import { DropdownType } from "@/type/common.types";
 import TextBox from "@/components/TextBox";
 import { ROLES } from "@/constants/data";
+import { getCookieUser } from "@/utils/cookie.util";
+import { logActivity } from "@/utils/logActivity";
 
 
 const EditStaffModal: React.FC<EditStaffModalProps> = ({ isOpen, onClose, initialValues, reloadData }) => {
     const theme = useTheme();
+    const user = getCookieUser();
 
     const [titles, setTitles] = useState<DropdownType[]>([]);
     const [genders, setGenders] = useState<DropdownType[]>([]);
@@ -49,8 +52,19 @@ const EditStaffModal: React.FC<EditStaffModalProps> = ({ isOpen, onClose, initia
     };
 
     useEffect(() => {
-        fetchDropdownData();
-    }, []);
+        if (isOpen) {
+            fetchDropdownData();
+
+            if (user) {
+                logActivity({
+                    userId: user.id,
+                    action: "EDIT_STAFF_MODAL_OPEN",
+                    path: "/modules/staff/ui/EditStaffModal",
+                    method: "CLIENT",
+                });
+            }
+        }
+    }, [isOpen]);
 
     // Handle form submission
     const handleSubmit = async (values: StaffType, { resetForm }: FormikHelpers<StaffType>) => {
@@ -59,6 +73,20 @@ const EditStaffModal: React.FC<EditStaffModalProps> = ({ isOpen, onClose, initia
 
             if (response.success) {
                 toast.success(response.message);
+
+                if (user) {
+                    logActivity({
+                        userId: user.id,
+                        action: "STAFF_UPDATED_SUCCESS",
+                        path: "/modules/staff/ui/EditStaffModal",
+                        endpoint: "/api/staff/update",
+                        method: "POST",
+                        meta: {
+                            staff: values.fullName,
+                        }
+                    });
+                }
+
                 reloadData();
                 onClose();
                 resetForm();
@@ -272,7 +300,18 @@ const EditStaffModal: React.FC<EditStaffModalProps> = ({ isOpen, onClose, initia
                                 }}
                             >
                                 <Button
-                                    onClick={onClose}
+                                    onClick={() => {
+                                        onClose();
+
+                                        if (user) {
+                                            logActivity({
+                                                userId: user.id,
+                                                action: "UPDATE_STAFF_CANCEL",
+                                                path: "/modules/staff/ui/EditStaffModal",
+                                                method: "CLIENT",
+                                            });
+                                        }
+                                    }}
                                     color="secondary"
                                     sx={{
                                         backgroundColor: "#f5f5f5",

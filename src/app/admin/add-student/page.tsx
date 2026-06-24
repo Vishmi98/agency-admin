@@ -3,22 +3,37 @@
 import { Box, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 
 import AddStudent from '@/modules/student/ui/AddStudent';
 import { getCookieUser } from '@/utils/cookie.util';
+import { logActivity } from '@/utils/logActivity';
 
 
 const AddStudentPage = () => {
     const theme = useTheme();
-    const user = getCookieUser()
+    const user = useMemo(() => getCookieUser(), []);
+    const didFetch = useRef(false);
     const router = useRouter();
 
     useEffect(() => {
         if (!user) {
             router.push('/');
+            return;
         }
-    }, [user, router]);
+
+        if (didFetch.current) return;
+        didFetch.current = true;
+
+        // 📌 PAGE VIEW LOG
+        logActivity({
+            userId: user.id,
+            action: "ADD_STUDENT_PAGE_VIEW",
+            path: "/app/admin/add-student",
+            method: "CLIENT",
+        });
+
+    }, []);
 
     return (
         <Box

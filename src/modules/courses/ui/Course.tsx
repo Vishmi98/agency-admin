@@ -11,13 +11,6 @@ import {
     Divider,
     Chip,
     Stack,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
-    Paper
 } from '@mui/material';
 import DownloadIcon from '@mui/icons-material/Download';
 import CloseIcon from '@mui/icons-material/Close';
@@ -31,17 +24,34 @@ import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
 import StarIcon from '@mui/icons-material/Star';
 import ViewListIcon from '@mui/icons-material/ViewList';
 import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
-import PeopleIcon from '@mui/icons-material/People';
 
 import { CourseProp } from '../courses.types';
 
+import { getCookieUser } from '@/utils/cookie.util';
+import { logActivity } from '@/utils/logActivity';
+
+
 const Course: React.FC<CourseProp> = ({ course, setIsModalOpen }) => {
     const courseRef = useRef<HTMLDivElement>(null);
+    const user = getCookieUser();
 
     const handleDownloadPDF = async () => {
         const html2pdf = (await import("html2pdf.js")).default;
         const element = courseRef.current;
         if (!element) return;
+
+        if (user) {
+            logActivity({
+                userId: user.id,
+                action: "COURSE_PDF_DOWNLOAD",
+                path: "/modules/courses/ui/Course",
+                method: "CLIENT",
+                meta: {
+                    courseId: course.id,
+                    courseTitle: course.title,
+                },
+            });
+        }
 
         const options = {
             margin: 0.4,
@@ -52,6 +62,23 @@ const Course: React.FC<CourseProp> = ({ course, setIsModalOpen }) => {
         };
 
         html2pdf().set(options).from(element).save();
+    };
+
+    const handleClose = () => {
+        setIsModalOpen(false);
+
+        // ✅ LOG CLOSE
+        if (user) {
+            logActivity({
+                userId: user.id,
+                action: "COURSE_MODAL_CLOSE",
+                path: "/modules/courses/ui/Course",
+                method: "CLIENT",
+                meta: {
+                    courseId: course.id,
+                },
+            });
+        }
     };
 
     return (
@@ -82,7 +109,7 @@ const Course: React.FC<CourseProp> = ({ course, setIsModalOpen }) => {
                         <DownloadIcon fontSize="small" />
                     </IconButton>
                     <IconButton
-                        onClick={() => setIsModalOpen(false)}
+                        onClick={handleClose}
                         size="small"
                         sx={{ bgcolor: '#fef2f2', color: '#ef4444', '&:hover': { bgcolor: '#fee2e2' }, transition: 'all 0.2s' }}
                         title="Close Window"

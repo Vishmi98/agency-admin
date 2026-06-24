@@ -1,9 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import {
-    Box,
-    IconButton,
     Paper,
     Skeleton,
     Table,
@@ -13,11 +11,9 @@ import {
     TableHead,
     TablePagination,
     TableRow,
-    Typography,
 } from "@mui/material";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
-import { InquiriesTableProps, InquiryDataType } from "../inquiries.types";
+import { InquiriesTableProps } from "../inquiries.types";
 
 const InquiriesTable: React.FC<InquiriesTableProps> = ({
     totalRows,
@@ -28,26 +24,15 @@ const InquiriesTable: React.FC<InquiriesTableProps> = ({
     onPageChange,
     onRowsPerPageChange,
 }) => {
-    const [expandedRows, setExpandedRows] = useState<number[]>([]);
-    const [statusModalOpen, setStatusModalOpen] = useState(false);
-    const [selectedInquiry, setSelectedInquiry] = useState<InquiryDataType | null>(null);
-
     const columns = [
         { label: "Inquiry ID", key: "id", width: "10%", align: "center" as const },
-        { label: "Student", key: "student", width: "30%", align: "left" as const },
-        { label: "Email", key: "email", width: "30%", align: "left" as const },
-        { label: "Phone Number", key: "phone", width: "30%", align: "left" as const },
+        { label: "Student", key: "student", width: "20%", align: "left" as const },
+        { label: "Email", key: "email", width: "20%", align: "left" as const },
+        { label: "Phone Number", key: "phone", width: "20%", align: "left" as const },
+        { label: "Message", key: "message", width: "30%", align: "left" as const },
         // { label: "Status", key: "status", width: "10%", align: "center" as const },
         // { label: "", key: "actions", width: "5%", align: "center" as const },
     ];
-
-    const toggleExpandRow = (leadId: number) => {
-        setExpandedRows((prev) =>
-            prev.includes(leadId)
-                ? prev.filter((id) => id !== leadId)
-                : [...prev, leadId]
-        );
-    };
 
     const renderRows = () => {
         if (isLoading) {
@@ -97,6 +82,10 @@ const InquiriesTable: React.FC<InquiriesTableProps> = ({
 
                     <TableCell>
                         {lead.phone || ""}
+                    </TableCell>
+
+                     <TableCell>
+                        {lead.message || ""}
                     </TableCell>
                     {/* 
                     <TableCell align="center">

@@ -11,6 +11,9 @@ import Student from './Student';
 import EditStudentModal from './EditStudentModal';
 import { StudentDataType, StudentTableProps } from '../student.types';
 
+import { getCookieUser } from '@/utils/cookie.util';
+import { logActivity } from '@/utils/logActivity';
+
 
 const StudentsTable: React.FC<StudentTableProps> = ({
     totalRows,
@@ -27,15 +30,32 @@ const StudentsTable: React.FC<StudentTableProps> = ({
     const [openPreviewModal, setOpenPreviewModal] = useState(false);
     const [openEditModal, setOpenEditModal] = useState(false);
     const [expandedRows, setExpandedRows] = useState<number[]>([]);
+    const user = getCookieUser()
 
     const handlePreviewClick = (student: StudentDataType) => {
         setSelectedStudent(student);
         setOpenPreviewModal(true);
+
+        logActivity({
+            userId: user ? user.id : 0,
+            action: "PREVIEW_STUDENT_CLICK",
+            path: "/modules/student/ui/StudentsTable",
+            method: "CLIENT",
+            meta: { studentId: student.id },
+        });
     };
 
     const handleEditClick = (student: StudentDataType) => {
         setSelectedStudent(student);
         setOpenEditModal(true);
+
+        logActivity({
+            userId: user ? user.id : 0,
+            action: "EDIT_STUDENT_CLICK",
+            path: "/modules/student/ui/StudentsTable",
+            method: "CLIENT",
+            meta: { studentId: student.id },
+        });
     };
 
     const toggleExpandRow = (studentId: number) => {
@@ -44,6 +64,16 @@ const StudentsTable: React.FC<StudentTableProps> = ({
                 ? prev.filter(id => id !== studentId)
                 : [...prev, studentId]
         );
+
+        logActivity({
+            userId: user ? user.id : 0,
+            action: "STUDENT_ROW_EXPAND",
+            path: "/modules/student/ui/StudentsTable",
+            method: "CLIENT",
+            meta: {
+                studentId
+            }
+        });
     };
 
     const columns = [
@@ -122,14 +152,16 @@ const StudentsTable: React.FC<StudentTableProps> = ({
                         </TableCell>
                     ))}
                     <TableCell align="right" sx={{ display: "flex", gap: 1 }}>
-                        <IconButton onClick={() => handleEditClick(student)}>
-                            <EditIcon fontSize="small" />
-                        </IconButton>
-                        <IconButton onClick={() => handlePreviewClick(student)}>
-                            <RemoveRedEyeIcon fontSize="small" />
-                        </IconButton>
                         <IconButton onClick={() => toggleExpandRow(student.id)}>
                             <ExpandMoreIcon fontSize="small" />
+                        </IconButton>
+                        {user && user.roll === 1 && (
+                            <IconButton onClick={() => handleEditClick(student)}>
+                                <EditIcon fontSize="small" />
+                            </IconButton>
+                        )}
+                        <IconButton onClick={() => handlePreviewClick(student)}>
+                            <RemoveRedEyeIcon fontSize="small" />
                         </IconButton>
                     </TableCell>
                 </TableRow>

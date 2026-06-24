@@ -8,14 +8,30 @@ import CloseIcon from '@mui/icons-material/Close';
 
 import { StudentProp } from '../student.types';
 
+import { getCookieUser } from '@/utils/cookie.util';
+import { logActivity } from '@/utils/logActivity';
+
 
 const Student: React.FC<StudentProp> = ({ student, setIsModalOpen }) => {
     const studentRef = useRef<HTMLDivElement>(null);
+    const user = getCookieUser();
 
     const handleDownloadPDF = async () => {
         const html2pdf = (await import("html2pdf.js")).default;
         const element = studentRef.current;
         if (!element) return;
+
+        if (user) {
+            logActivity({
+                userId: user.id,
+                action: "STUDENT_PDF_DOWNLOAD",
+                path: "/modules/student/ui/Student",
+                method: "CLIENT",
+                meta: {
+                    student: student.fullName,
+                },
+            });
+        }
 
         const options = {
             margin: 0.5,
@@ -26,6 +42,23 @@ const Student: React.FC<StudentProp> = ({ student, setIsModalOpen }) => {
         };
 
         html2pdf().set(options).from(element).save();
+    };
+
+    const handleClose = () => {
+        setIsModalOpen(false);
+
+        // ✅ LOG CLOSE
+        if (user) {
+            logActivity({
+                userId: user.id,
+                action: "STUDENT_MODAL_CLOSE",
+                path: "/modules/student/ui/Student",
+                method: "CLIENT",
+                meta: {
+                    student: student.fullName,
+                },
+            });
+        }
     };
 
     return (
@@ -41,7 +74,7 @@ const Student: React.FC<StudentProp> = ({ student, setIsModalOpen }) => {
                 }}>
                     <CloseIcon
                         sx={{ width: 15, height: 15, cursor: "pointer" }}
-                        onClick={() => setIsModalOpen(false)}
+                        onClick={handleClose}
                     />
                 </Box>
                 <Box

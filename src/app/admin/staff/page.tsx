@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useReducer } from 'react';
+import { useCallback, useEffect, useMemo, useReducer, useRef } from 'react';
 import { Box, Button, Typography, useTheme } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import { useRouter } from 'next/navigation';
@@ -11,6 +11,7 @@ import { staffPageInitialState, staffPageReducer, StaffPageStateType } from '@/m
 import { getStaffData } from '@/modules/staff/services/staff.services';
 import AddStaffModal from '@/modules/staff/ui/AddStaffModal';
 import { getCookieUser } from '@/utils/cookie.util';
+import { logActivity } from '@/utils/logActivity';
 
 
 const StaffPage = () => {
@@ -18,14 +19,9 @@ const StaffPage = () => {
 
     const [state, dispatch] = useReducer(staffPageReducer, staffPageInitialState);
     const { staffs, isLoading, page, selectedStaff, limit, totalRows, search, isOpen } = state;
-    const user = getCookieUser()
+    const user = useMemo(() => getCookieUser(), []);
+    const didFetch = useRef(false);
     const router = useRouter();
-
-    useEffect(() => {
-        if (!user) {
-            router.push('/');
-        }
-    }, [user, router]);
 
     const updateState = (value: Partial<StaffPageStateType>) => {
         dispatch({ type: 'update', payload: value });
@@ -48,26 +44,104 @@ const StaffPage = () => {
     }, [page, limit, search]);
 
     useEffect(() => {
+        if (!user) {
+            router.push('/');
+            return;
+        }
+
+        if (didFetch.current) return;
+        didFetch.current = true;
+
         fetchStaffData(true);
-    }, [limit]);
+
+        // ✅ activity log ONLY ONCE
+        logActivity({
+            userId: user.id,
+            action: "STAFFS_PAGE_VIEW",
+            path: "/app/admin/staffs",
+            method: "CLIENT",
+        });
+
+    }, []);
 
     const handlePageChange = (newPage: number) => {
         updateState({ page: newPage });
         fetchStaffData(true, newPage);
+
+        if (user) {
+            logActivity({
+                userId: user.id,
+                action: "STAFFS_PAGE_CHANGE",
+                path: "/app/admin/staffs",
+                method: "CLIENT",
+                meta: {
+                    page: newPage
+                }
+            });
+        }
     };
 
     const handleRowsPerPageChange = (rows: number) => {
         updateState({ limit: rows, page: 0 });
+
+        if (user) {
+            logActivity({
+                userId: user.id,
+                action: "STAFFS_LIMIT_CHANGE",
+                path: "/app/admin/staffs",
+                method: "CLIENT",
+                meta: {
+                    limit: rows
+                }
+            });
+        }
     };
 
     const handleSearch = async () => {
         updateState({ page: 0, limit: 5 });
         await fetchStaffData(false, 0);
+
+        if (user) {
+            logActivity({
+                userId: user.id,
+                action: "STAFFS_SEARCH",
+                path: "/app/admin/staffs",
+                method: "CLIENT",
+                meta: {
+                    search: search // add this
+                }
+            });
+        }
     };
 
     const handleClearSearch = async () => {
         updateState({ search: '', page: 0, limit: 5 });
         await fetchStaffData(false, 0, true);
+
+        if (user) {
+            logActivity({
+                userId: user.id,
+                action: "STAFFS_CLEAR_SEARCH",
+                path: "/app/admin/staffs",
+                method: "CLIENT"
+            });
+        }
+    };
+
+    const handleAddStaffClick = () => {
+        dispatch({ type: 'update', payload: { isOpen: true } });
+
+        if (user) {
+            logActivity({
+                userId: user.id,
+                action: "ADD_STAFF_BUTTON_CLICK",
+                path: "/app/admin/staff",
+                method: "CLIENT",
+                meta: {
+                    source: "StaffsPageHeaderButton"
+                }
+            });
+        }
     };
 
     return (
@@ -109,7 +183,7 @@ const StaffPage = () => {
                                     <Button
                                         variant="contained"
                                         size="small"
-                                        onClick={() => dispatch({ type: 'update', payload: { isOpen: true } })}
+                                        onClick={handleAddStaffClick}
                                         color="primary"
                                         sx={{
                                             backgroundColor: "#1976d2",

@@ -24,10 +24,13 @@ import { DropdownType } from "@/type/common.types";
 import { AddModalProps } from "@/modules/countries/countries.types";
 import TextBox from "@/components/TextBox";
 import { ROLES } from "@/constants/data";
+import { getCookieUser } from "@/utils/cookie.util";
+import { logActivity } from "@/utils/logActivity";
 
 
 const AddStaffModal: FC<AddModalProps> = ({ isOpen, onClose, handleReload }) => {
     const theme = useTheme();
+    const user = getCookieUser();
 
     const [titles, setTitles] = useState<DropdownType[]>([]);
     const [genders, setGenders] = useState<DropdownType[]>([]);
@@ -50,7 +53,18 @@ const AddStaffModal: FC<AddModalProps> = ({ isOpen, onClose, handleReload }) => 
     };
 
     useEffect(() => {
-        if (isOpen) fetchDropdownData();
+        if (isOpen) {
+            fetchDropdownData();
+
+            if (user) {
+                logActivity({
+                    userId: user.id,
+                    action: "ADD_STAFF_MODAL_OPEN",
+                    path: "/modules/staff/ui/AddStaffModal",
+                    method: "CLIENT",
+                });
+            }
+        }
     }, [isOpen]);
 
     const handleSubmit = async (
@@ -61,6 +75,20 @@ const AddStaffModal: FC<AddModalProps> = ({ isOpen, onClose, handleReload }) => 
             const response = await createStaff(values);
             if (response.success) {
                 toast.success(response.message);
+
+                if (user) {
+                    logActivity({
+                        userId: user.id,
+                        action: "STAFF_CREATED_SUCCESS",
+                        path: "/modules/staff/ui/AddStaffModal",
+                        endpoint: "/api/staff/create",
+                        method: "POST",
+                        meta: {
+                            staff: values.fullName,
+                        }
+                    });
+                }
+
                 handleReload();
                 onClose();
                 resetForm();
@@ -284,7 +312,18 @@ const AddStaffModal: FC<AddModalProps> = ({ isOpen, onClose, handleReload }) => 
                                 }}
                             >
                                 <Button
-                                    onClick={onClose}
+                                    onClick={() => {
+                                        onClose();
+
+                                        if (user) {
+                                            logActivity({
+                                                userId: user.id,
+                                                action: "ADD_STAFF_CANCEL",
+                                                path: "/modules/staff/ui/AddStaffModal",
+                                                method: "CLIENT",
+                                            });
+                                        }
+                                    }}
                                     color="secondary"
                                     sx={{
                                         backgroundColor: "#f5f5f5",

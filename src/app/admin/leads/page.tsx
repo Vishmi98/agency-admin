@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useReducer } from 'react';
+import { useCallback, useEffect, useReducer, useMemo, useRef } from 'react';
 import { Button, Box, Typography, useTheme } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import { useRouter } from 'next/navigation';
@@ -10,32 +10,40 @@ import { getLeadsData } from '@/modules/leads/leads.service';
 import LeadsTable from '@/modules/leads/ui/LeadsTable';
 import AddLeadModal from '@/modules/leads/ui/AddLeadModal';
 import { getCookieUser } from '@/utils/cookie.util';
-
+import { logActivity } from '@/utils/logActivity';
 
 const LeadsPage = () => {
     const theme = useTheme();
+    const router = useRouter();
 
     const [state, dispatch] = useReducer(leadPageReducer, leadPageInitialState);
     const { leads, isLoading, page, limit, totalRows, search, isOpen } = state;
-    const user = getCookieUser()
-    const router = useRouter();
-
-    useEffect(() => {
-        if (!user) {
-            router.push('/');
-        }
-    }, [user, router]);
+    const user = useMemo(() => getCookieUser(), []);
+    const didFetch = useRef(false);
 
     const updateState = (value: Partial<LeadPageStateType>) => {
         dispatch({ type: 'update', payload: value });
     };
 
-    const fetchLeadsData = useCallback(async (noLoading = false, paramPage = page, propSearch = false) => {
+    // ==============================
+    // FETCH LEADS
+    // ==============================
+    const fetchLeadsData = useCallback(async (
+        noLoading = false,
+        paramPage = page,
+        propSearch = false
+    ) => {
         try {
             if (!noLoading) {
                 updateState({ isLoading: true });
             }
-            const response = await getLeadsData(paramPage + 1, limit, propSearch ? "" : search);
+
+            const response = await getLeadsData(
+                paramPage + 1,
+                limit,
+                propSearch ? "" : search
+            );
+
             if (response?.success) {
                 updateState({
                     leads: response.leads,
@@ -49,104 +57,145 @@ const LeadsPage = () => {
         }
     }, [page, limit, search]);
 
-
+    // ==============================
+    // INITIAL LOAD (FIXED)
+    // ==============================
     useEffect(() => {
-        fetchLeadsData(true);
-    }, [limit]);
+        if (!user) {
+            router.push('/');
+            return;
+        }
 
+        if (didFetch.current) return;
+        didFetch.current = true;
+
+        fetchLeadsData(true);
+
+        // ✅ activity log ONLY ONCE
+        logActivity({
+            userId: user.id,
+            action: "LEADS_PAGE_VIEW",
+            path: "/app/admin/leads",
+            method: "CLIENT",
+        });
+
+    }, []);
+
+    // ==============================
+    // PAGE CHANGE
+    // ==============================
     const handlePageChange = (newPage: number) => {
         updateState({ page: newPage });
         fetchLeadsData(true, newPage);
+
+        if (user) {
+            logActivity({
+                userId: user.id,
+                action: "LEADS_PAGE_CHANGE",
+                path: "/app/admin/leads",
+                method: "CLIENT",
+                meta: {
+                    page: newPage
+                }
+            });
+        }
     };
 
     const handleRowsPerPageChange = (rows: number) => {
         updateState({ limit: rows, page: 0 });
+
+        if (user) {
+            logActivity({
+                userId: user.id,
+                action: "LEADS_LIMIT_CHANGE",
+                path: "/app/admin/leads",
+                method: "CLIENT",
+                meta: {
+                    limit: rows
+                }
+            });
+        }
     };
 
-    const handleSearch = async () => {
-        updateState({ page: 0, limit: 5 });
-        await fetchLeadsData(false, 0);
-    };
+    // ==============================
+    // ADD LEAD BUTTON
+    // ==============================
+    const handleAddLeadClick = () => {
+        dispatch({ type: 'update', payload: { isOpen: true } });
 
-    const handleClearSearch = async () => {
-        updateState({ search: '', page: 0, limit: 5 });
-        await fetchLeadsData(false, 0, true);
+        if (user) {
+            logActivity({
+                userId: user.id,
+                action: "ADD_LEAD_BUTTON_CLICK",
+                path: "/app/admin/leads",
+                method: "CLIENT",
+                meta: {
+                    source: "LeadsPageHeaderButton"
+                }
+            });
+        }
     };
 
     return (
-        <>
-            <Box sx={{
-                width: {
-                    xs: 'auto',
-                    md: '100%',
-                },
-                height: '100%',
-                overflowX: { xs: 'scroll', md: 'hidden' },
-                display: "flex",
-                flexDirection: "column",
-                gap: 1,
-                marginTop: { xs: 1, lg: 0 }
-            }}>
-                {/* <LeadSearch
-                    search={search}
-                    setSearch={(value) => updateState({ search: value })}
-                    loading={isLoading}
-                    onSearch={handleSearch}
-                    handleClearSearch={handleClearSearch}
-                /> */}
-                <Box
-                    sx={{
-                        width: '100%',
-                        color: theme.palette.text.primary,
-                        borderRadius: "5px",
-                    }}
-                >
-                    <Box display="flex" justifyContent="space-between" alignItems="center" marginBottom={3}>
-                        <Typography variant="h6" color={theme.palette.text.primary}>
-                            Leads
-                        </Typography>
-                        {
-                            user && user.roll === 1 && (
-                                <Box display="flex" justifyContent="flex-end">
-                                    <Button
-                                        variant="contained"
-                                        size="small"
-                                        onClick={() => dispatch({ type: 'update', payload: { isOpen: true } })}
-                                        color="primary"
-                                        sx={{
-                                            backgroundColor: "#1976d2",
-                                            borderRadius: "5px",
-                                            textTransform: "none",
-                                            "&:hover": { backgroundColor: "#115293" },
-                                            width: "160px"
-                                        }}
-                                    >
-                                        <AddIcon sx={{ width: 20, height: 20 }} />
-                                        Add Lead
-                                    </Button>
-                                    <AddLeadModal
-                                        isOpen={isOpen}
-                                        onClose={() => dispatch({ type: 'update', payload: { isOpen: false } })}
-                                        handleReload={fetchLeadsData}
-                                    />
-                                </Box>
-                            )
-                        }
-                    </Box>
-                    <LeadsTable
-                        totalRows={totalRows}
-                        leads={leads}
-                        isLoading={isLoading}
-                        page={page}
-                        limit={limit}
-                        onPageChange={handlePageChange}
-                        onRowsPerPageChange={handleRowsPerPageChange}
-                        reloadData={() => fetchLeadsData(true, page)}
-                    />
-                </Box>
-            </Box>
-        </>
-    )
-}
+        <Box sx={{
+            width: { xs: 'auto', md: '100%' },
+            height: '100%',
+            overflowX: { xs: 'scroll', md: 'hidden' },
+            display: "flex",
+            flexDirection: "column",
+            gap: 1,
+            marginTop: { xs: 1, lg: 0 }
+        }}>
 
-export default LeadsPage
+            <Box sx={{ width: '100%', color: theme.palette.text.primary }}>
+
+                {/* HEADER */}
+                <Box display="flex" justifyContent="space-between" alignItems="center" marginBottom={3}>
+                    <Typography variant="h6">
+                        Leads
+                    </Typography>
+
+                    {user && user.roll === 1 && (
+                        <Button
+                            variant="contained"
+                            size="small"
+                            onClick={handleAddLeadClick}
+                            sx={{
+                                backgroundColor: "#1976d2",
+                                width: "160px",
+                                textTransform: "none",
+                            }}
+                        >
+                            <AddIcon sx={{ width: 20, height: 20 }} />
+                            Add Lead
+                        </Button>
+                    )}
+                </Box>
+
+                {/* TABLE */}
+                <LeadsTable
+                    totalRows={totalRows}
+                    leads={leads}
+                    isLoading={isLoading}
+                    page={page}
+                    limit={limit}
+                    onPageChange={handlePageChange}
+                    onRowsPerPageChange={handleRowsPerPageChange}
+                    reloadData={() => fetchLeadsData(true, page)}
+                />
+
+                {/* MODAL */}
+                <AddLeadModal
+                    isOpen={isOpen}
+                    onClose={() =>
+                        dispatch({ type: 'update', payload: { isOpen: false } })
+                    }
+                    handleReload={fetchLeadsData}
+                />
+
+            </Box>
+        </Box>
+    );
+};
+
+export default LeadsPage;

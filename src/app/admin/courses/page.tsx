@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useReducer } from 'react';
+import { useCallback, useEffect, useMemo, useReducer, useRef } from 'react';
 import { Button, Box, Typography, useTheme } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import { useRouter } from 'next/navigation';
@@ -10,6 +10,7 @@ import { getCoursesData } from '@/modules/courses/services/courses.service';
 import CoursesTable from '@/modules/courses/ui/CoursesTable';
 import AddCourseModal from '@/modules/courses/ui/AddCourseModal';
 import { getCookieUser } from '@/utils/cookie.util';
+import { logActivity } from '@/utils/logActivity';
 
 
 const CoursesPage = () => {
@@ -17,14 +18,9 @@ const CoursesPage = () => {
 
     const [state, dispatch] = useReducer(coursePageReducer, coursePageInitialState);
     const { courses, isLoading, page, limit, totalRows, search, isOpen, selectedCourse } = state;
-    const user = getCookieUser()
+    const user = useMemo(() => getCookieUser(), []);
+    const didFetch = useRef(false);
     const router = useRouter();
-
-    useEffect(() => {
-        if (!user) {
-            router.push('/');
-        }
-    }, [user, router]);
 
     const updateState = (value: Partial<CoursePageStateType>) => {
         dispatch({ type: 'update', payload: value });
@@ -49,28 +45,74 @@ const CoursesPage = () => {
         }
     }, [page, limit, search]);
 
-
     useEffect(() => {
+        if (!user) {
+            router.push('/');
+            return;
+        }
+
+        if (didFetch.current) return;
+        didFetch.current = true;
+
         fetchCoursesData(true);
-    }, [limit]);
+
+        // ✅ activity log ONLY ONCE
+        logActivity({
+            userId: user.id,
+            action: "COURSES_PAGE_VIEW",
+            path: "/app/admin/courses",
+            method: "CLIENT",
+        });
+
+    }, []);
 
     const handlePageChange = (newPage: number) => {
         updateState({ page: newPage });
         fetchCoursesData(true, newPage);
+
+        if (user) {
+            logActivity({
+                userId: user.id,
+                action: "COURSES_PAGE_CHANGE",
+                path: "/app/admin/courses",
+                method: "CLIENT",
+                meta: {
+                    page: newPage
+                }
+            });
+        }
     };
 
     const handleRowsPerPageChange = (rows: number) => {
         updateState({ limit: rows, page: 0 });
+
+        if (user) {
+            logActivity({
+                userId: user.id,
+                action: "COURSES_LIMIT_CHANGE",
+                path: "/app/admin/courses",
+                method: "CLIENT",
+                meta: {
+                    limit: rows
+                }
+            });
+        }
     };
 
-    const handleSearch = async () => {
-        updateState({ page: 0, limit: 5 });
-        await fetchCoursesData(false, 0);
-    };
+    const handleAddCourseClick = () => {
+        dispatch({ type: 'update', payload: { isOpen: true } });
 
-    const handleClearSearch = async () => {
-        updateState({ search: '', page: 0, limit: 5 });
-        await fetchCoursesData(false, 0, true);
+        if (user) {
+            logActivity({
+                userId: user.id,
+                action: "ADD_COURSE_BUTTON_CLICK",
+                path: "/app/admin/courses",
+                method: "CLIENT",
+                meta: {
+                    source: "CoursesPageHeaderButton"
+                }
+            });
+        }
     };
 
     return (
@@ -87,13 +129,6 @@ const CoursesPage = () => {
                 gap: 1,
                 marginTop: { xs: 1, lg: 0 }
             }}>
-                {/* <PackageSearch
-                    search={search}
-                    setSearch={(value) => updateState({ search: value })}
-                    loading={isLoading}
-                    onSearch={handleSearch}
-                    handleClearSearch={handleClearSearch}
-                /> */}
                 <Box
                     sx={{
                         width: '100%',
@@ -111,7 +146,7 @@ const CoursesPage = () => {
                                     <Button
                                         variant="contained"
                                         size="small"
-                                        onClick={() => dispatch({ type: 'update', payload: { isOpen: true } })}
+                                        onClick={handleAddCourseClick}
                                         color="primary"
                                         sx={{
                                             backgroundColor: "#1976d2",

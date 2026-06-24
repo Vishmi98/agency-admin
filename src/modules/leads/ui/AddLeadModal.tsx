@@ -30,6 +30,8 @@ import { StudentDataType } from "@/modules/student/student.types";
 import { StaffDataType } from "@/modules/staff/staff.types";
 import { CourseDataType } from "@/modules/courses/courses.types";
 import { getCoursesData } from "@/modules/courses/services/courses.service";
+import { getCookieUser } from "@/utils/cookie.util";
+import { logActivity } from "@/utils/logActivity";
 
 
 const AddLeadModal: FC<AddModalProps> = ({ isOpen, onClose, handleReload }) => {
@@ -39,6 +41,7 @@ const AddLeadModal: FC<AddModalProps> = ({ isOpen, onClose, handleReload }) => {
     const [students, setStudents] = useState<StudentDataType[]>([]);
     const [staffs, setStaffs] = useState<StaffDataType[]>([]);
     const [isLoading, setIsLoading] = useState(false);
+    const user = getCookieUser();
 
     const fetchData = async () => {
         try {
@@ -57,7 +60,18 @@ const AddLeadModal: FC<AddModalProps> = ({ isOpen, onClose, handleReload }) => {
     };
 
     useEffect(() => {
-        if (isOpen) fetchData();
+        if (isOpen) {
+            fetchData();
+
+            if (user) {
+                logActivity({
+                    userId: user.id,
+                    action: "ADD_LEAD_MODAL_OPEN",
+                    path: "/modules/leads/ui/AddLeadModal",
+                    method: "CLIENT",
+                });
+            }
+        }
     }, [isOpen]);
 
     const handleSubmit = async (
@@ -71,6 +85,21 @@ const AddLeadModal: FC<AddModalProps> = ({ isOpen, onClose, handleReload }) => {
 
             if (response.success) {
                 toast.success(response.message);
+                if (user) {
+                    logActivity({
+                        userId: user.id,
+                        action: "LEAD_CREATED_SUCCESS",
+                        path: "/modules/leads/ui/AddLeadModal",
+                        endpoint: "/api/lead/create",
+                        method: "POST",
+                        meta: {
+                            studentId: values.studentId,
+                            staffId: values.staffId,
+                            courseId: values.courseId,
+                        }
+                    });
+                }
+
                 handleReload();
                 onClose();
                 resetForm();
@@ -181,7 +210,7 @@ const AddLeadModal: FC<AddModalProps> = ({ isOpen, onClose, handleReload }) => {
                                         <Typography fontSize="12px">Select Course</Typography>
                                         <Autocomplete
                                             options={courses}
-                                            getOptionLabel={(option) => `${option.title}(${option.shortCode})`}
+                                            getOptionLabel={(option) => `${option.title}`}
                                             loading={isLoading}
                                             onChange={(event, value) => {
                                                 setFieldValue('courseId', value ? value.id : '');
@@ -234,7 +263,18 @@ const AddLeadModal: FC<AddModalProps> = ({ isOpen, onClose, handleReload }) => {
                                 }}
                             >
                                 <Button
-                                    onClick={onClose}
+                                    onClick={() => {
+                                        onClose();
+
+                                        if (user) {
+                                            logActivity({
+                                                userId: user.id,
+                                                action: "ADD_LEAD_CANCEL",
+                                                path: "/modules/leads/ui/AddLeadModal",
+                                                method: "CLIENT",
+                                            });
+                                        }
+                                    }}
                                     color="secondary"
                                     sx={{
                                         backgroundColor: "#f5f5f5",
