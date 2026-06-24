@@ -20,10 +20,6 @@ const Dashboard = () => {
     }
   }, [user, router]);
 
-  if (user && user.roll !== 6 && user && user.roll !== 5) {
-    return <></>
-  }
-
   return (
     <PageContainer title="Dashboard" description="this is Dashboard">
       <Box>

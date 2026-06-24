@@ -105,29 +105,33 @@ const LeadsPage = () => {
                         <Typography variant="h6" color={theme.palette.text.primary}>
                             Leads
                         </Typography>
-                        <Box display="flex" justifyContent="flex-end">
-                            <Button
-                                variant="contained"
-                                size="small"
-                                onClick={() => dispatch({ type: 'update', payload: { isOpen: true } })}
-                                color="primary"
-                                sx={{
-                                    backgroundColor: "#1976d2",
-                                    borderRadius: "5px",
-                                    textTransform: "none",
-                                    "&:hover": { backgroundColor: "#115293" },
-                                    width: "160px"
-                                }}
-                            >
-                                <AddIcon sx={{ width: 20, height: 20 }} />
-                                Add Lead
-                            </Button>
-                            <AddLeadModal
-                                isOpen={isOpen}
-                                onClose={() => dispatch({ type: 'update', payload: { isOpen: false } })}
-                                handleReload={fetchLeadsData}
-                            />
-                        </Box>
+                        {
+                            user && user.roll === 1 && (
+                                <Box display="flex" justifyContent="flex-end">
+                                    <Button
+                                        variant="contained"
+                                        size="small"
+                                        onClick={() => dispatch({ type: 'update', payload: { isOpen: true } })}
+                                        color="primary"
+                                        sx={{
+                                            backgroundColor: "#1976d2",
+                                            borderRadius: "5px",
+                                            textTransform: "none",
+                                            "&:hover": { backgroundColor: "#115293" },
+                                            width: "160px"
+                                        }}
+                                    >
+                                        <AddIcon sx={{ width: 20, height: 20 }} />
+                                        Add Lead
+                                    </Button>
+                                    <AddLeadModal
+                                        isOpen={isOpen}
+                                        onClose={() => dispatch({ type: 'update', payload: { isOpen: false } })}
+                                        handleReload={fetchLeadsData}
+                                    />
+                                </Box>
+                            )
+                        }
                     </Box>
                     <LeadsTable
                         totalRows={totalRows}

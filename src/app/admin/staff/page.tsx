@@ -103,29 +103,33 @@ const StaffPage = () => {
                         <Typography variant="h6" color={theme.palette.text.primary}>
                             Staff
                         </Typography>
-                        <Box display="flex" justifyContent="flex-end">
-                            <Button
-                                variant="contained"
-                                size="small"
-                                onClick={() => dispatch({ type: 'update', payload: { isOpen: true } })}
-                                color="primary"
-                                sx={{
-                                    backgroundColor: "#1976d2",
-                                    borderRadius: "5px",
-                                    textTransform: "none",
-                                    "&:hover": { backgroundColor: "#115293" },
-                                    width: "160px"
-                                }}
-                            >
-                                <AddIcon sx={{ width: 20, height: 20 }} />
-                                Add Staff
-                            </Button>
-                            <AddStaffModal
-                                isOpen={isOpen}
-                                onClose={() => dispatch({ type: 'update', payload: { isOpen: false } })}
-                                handleReload={fetchStaffData}
-                            />
-                        </Box>
+                        {
+                            user && user.roll === 1 && (
+                                <Box display="flex" justifyContent="flex-end">
+                                    <Button
+                                        variant="contained"
+                                        size="small"
+                                        onClick={() => dispatch({ type: 'update', payload: { isOpen: true } })}
+                                        color="primary"
+                                        sx={{
+                                            backgroundColor: "#1976d2",
+                                            borderRadius: "5px",
+                                            textTransform: "none",
+                                            "&:hover": { backgroundColor: "#115293" },
+                                            width: "160px"
+                                        }}
+                                    >
+                                        <AddIcon sx={{ width: 20, height: 20 }} />
+                                        Add Staff
+                                    </Button>
+                                    <AddStaffModal
+                                        isOpen={isOpen}
+                                        onClose={() => dispatch({ type: 'update', payload: { isOpen: false } })}
+                                        handleReload={fetchStaffData}
+                                    />
+                                </Box>
+                            )
+                        }
                     </Box>
                     <StaffTable
                         totalRows={totalRows}

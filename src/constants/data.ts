@@ -1,23 +1,6 @@
 import {
-    IconBook,
-    IconBuildingCommunity,
-    IconCalendar,
-    IconCalendarTime,
-    IconCash,
-    IconClock,
-    IconCurrencyDollar,
-    IconFileText,
-    IconGlobe,
-    IconLayoutDashboard,
-    IconMapPin,
-    IconMoneybag,
-    IconPhoneCall,
     IconReceipt,
     IconSchool,
-    IconSettings,
-    IconTrophy,
-    IconUser,
-    IconUserHeart,
     IconUserPlus,
     IconUsersGroup,
     IconWorld,
@@ -30,16 +13,9 @@ import { UserType } from "@/modules/users/user.types";
 
 
 export const ROLES = [
-    { id: 1, label: 'Admin' },
-    { id: 2, label: 'Consultant' },
-    { id: 3, label: 'HR' },
-    { id: 4, label: 'Accounts' },
-    { id: 5, label: 'CEO' },
-    { id: 6, label: 'Marketing Manager' },
-    { id: 7, label: 'Branch Manager' },
-    { id: 8, label: 'Operation Manager' },
-    { id: 9, label: 'Coordinator' },
-    { id: 10, label: 'Junior Consultant' }
+    { id: 1, label: 'Super Admin' },
+    { id: 2, label: 'SL Team' },
+    { id: 3, label: 'NZ Team' },
 ];
 
 export const Branches = [
@@ -55,357 +31,7 @@ export const Branches = [
     }
 ]
 
-export const ADMIN_MENU_ITEMS = [
-
-    {
-        id: uniqueId(),
-        title: "Universities",
-        icon: IconSchool,
-        href: "/admin/universities",
-    },
-    // {
-    //     id: uniqueId(),
-    //     title: "Courses",
-    //     icon: IconBook,
-    //     href: "/admin/course",
-    // },
-    {
-        id: uniqueId(),
-        title: "Users",
-        icon: IconUsersGroup,
-        href: "/admin/users",
-    },
-    {
-        id: uniqueId(),
-        title: "Students",
-        icon: IconUsersGroup,
-        children: [
-            {
-                id: uniqueId(),
-                title: "Students",
-                icon: IconUsersGroup,
-                href: "/admin/students",
-            },
-            {
-                id: uniqueId(),
-                title: "Add Student",
-                icon: IconUsersGroup,
-                href: "/admin/add-student",
-            },
-            {
-                id: uniqueId(),
-                title: "Qualifications Types",
-                icon: IconMoneybag,
-                href: "/admin/qualifications",
-            },
-        ]
-    },
-    {
-        id: uniqueId(),
-        title: "Countries",
-        icon: IconGlobe,
-        href: "/admin/countries",
-    },
-    {
-        id: uniqueId(),
-        title: "Payment types",
-        icon: IconGlobe,
-        href: "/admin/payment-types",
-    },
-    {
-        id: uniqueId(),
-        title: "Packages",
-        icon: IconMoneybag,
-        href: "/admin/packages",
-    },
-    {
-        id: uniqueId(),
-        title: "Attendance",
-        icon: IconCalendar,
-        href: "/admin/attendance",
-    },
-];
-
-export const SALES_EXECUTIVE_MENU_ITEMS = [
-    {
-        id: uniqueId(),
-        title: "Students",
-        icon: IconUsersGroup,
-        children: [
-            {
-                id: uniqueId(),
-                title: "Students",
-                icon: IconUsersGroup,
-                href: "/admin/students",
-            },
-            {
-                id: uniqueId(),
-                title: "Add student",
-                icon: IconUsersGroup,
-                href: "/admin/add-student",
-            },
-        ]
-    },
-    {
-        id: uniqueId(),
-        title: "Universities",
-        icon: IconSchool,
-        href: "/admin/universities",
-    },
-    {
-        id: uniqueId(),
-        title: "Packages",
-        icon: IconMoneybag,
-        href: "/admin/packages",
-    },
-    {
-        id: uniqueId(),
-        title: "Account",
-        icon: IconReceipt,
-        children: [
-            {
-                id: uniqueId(),
-                title: "Expenses Types",
-                icon: IconMoneybag,
-                href: "/admin/expenses-types",
-            },
-            {
-                id: uniqueId(),
-                title: "Add Expenses",
-                icon: IconMoneybag,
-                href: "/admin/add-expenses",
-            },
-            {
-                id: uniqueId(),
-                title: "University Payments",
-                icon: IconMoneybag,
-                href: "/admin/university-payments",
-            }
-        ]
-    },
-    {
-        id: uniqueId(),
-        title: "Roster",
-        icon: IconCalendar,
-        href: "/admin/roster",
-    },
-    {
-        id: uniqueId(),
-        title: "All Attendances",
-        icon: IconCalendar,
-        href: "/admin/all-attendance",
-    },
-    {
-        id: uniqueId(),
-        title: "My Attendances",
-        icon: IconCalendar,
-        href: "/admin/my-attendance",
-    },
-];
-
-export const HR_MENU_ITEMS = [
-
-    {
-        id: uniqueId(),
-        title: "Staff",
-        icon: IconUsersGroup,
-        href: "/admin/staff",
-    },
-    {
-        id: uniqueId(),
-        title: "Roster",
-        icon: IconCalendar,
-        href: "/admin/roster",
-    },
-    {
-        id: uniqueId(),
-        title: "Enter Attendance",
-        icon: IconUser,
-        href: "/admin/today-attendance",
-    },
-    {
-        id: uniqueId(),
-        title: "Attendance",
-        icon: IconUser,
-        href: "/admin/attendance",
-    },
-    {
-        id: uniqueId(),
-        title: "Create Roster",
-        icon: IconCalendar,
-        href: "/admin/create-roster",
-    },
-];
-
-export const ACCOUNTANTS_MENU_ITEMS = [
-
-    {
-        id: uniqueId(),
-        title: "Students",
-        icon: IconUsersGroup,
-        children: [
-            {
-                id: uniqueId(),
-                title: "Students",
-                icon: IconUsersGroup,
-                href: "/admin/students",
-            },
-            {
-                id: uniqueId(),
-                title: "Add student",
-                icon: IconUsersGroup,
-                href: "/admin/add-student",
-            },
-        ]
-    },
-    {
-        id: uniqueId(),
-        title: "Expenses Types",
-        icon: IconMoneybag,
-        href: "/admin/expenses-types",
-    },
-    {
-        id: uniqueId(),
-        title: "Add Expenses",
-        icon: IconMoneybag,
-        href: "/admin/add-expenses",
-    },
-    {
-        id: uniqueId(),
-        title: "Attendance",
-        icon: IconCalendar,
-        href: "/admin/attendance",
-    },
-];
-
-export const HR_ACCOUNTANT_MENU_ITEMS = [
-    {
-        id: uniqueId(),
-        title: "Staff",
-        icon: IconUsersGroup,
-        href: "/admin/staff",
-    },
-    {
-        id: uniqueId(),
-        title: "HR",
-        icon: IconUsersGroup,
-        children: [
-            {
-                id: uniqueId(),
-                title: "Enter Attendance",
-                icon: IconUser,
-                href: "/admin/today-attendance",
-            },
-            {
-                id: uniqueId(),
-                title: "Add Leave",
-                icon: IconUser,
-                href: "/admin/add-leave",
-            },
-            {
-                id: uniqueId(),
-                title: "Staff Leaves",
-                icon: IconUser,
-                href: "/admin/staff-leaves",
-            },
-            {
-                id: uniqueId(),
-                title: "Mark Out Time",
-                icon: IconClock,
-                href: "/admin/mark-out-time",
-            },
-            {
-                id: uniqueId(),
-                title: "Attendance",
-                icon: IconUser,
-                href: "/admin/attendance",
-            },
-            {
-                id: uniqueId(),
-                title: "Roster",
-                icon: IconCalendar,
-                href: "/admin/roster",
-            },
-            {
-                id: uniqueId(),
-                title: "Create Roster",
-                icon: IconCalendar,
-                href: "/admin/create-roster",
-            },
-            {
-                id: uniqueId(),
-                title: "Edit Roster",
-                icon: IconCalendar,
-                href: "/admin/edit-roster",
-            },
-            {
-                id: uniqueId(),
-                title: "All Attendances",
-                icon: IconCalendar,
-                href: "/admin/all-attendance",
-            },
-            {
-                id: uniqueId(),
-                title: "My Attendances",
-                icon: IconCalendar,
-                href: "/admin/my-attendance",
-            },
-
-        ]
-    },
-    {
-        id: uniqueId(),
-        title: "Students",
-        icon: IconUsersGroup,
-        children: [
-            {
-                id: uniqueId(),
-                title: "Students",
-                icon: IconUsersGroup,
-                href: "/admin/students",
-            },
-            {
-                id: uniqueId(),
-                title: "Add student",
-                icon: IconUsersGroup,
-                href: "/admin/add-student",
-            },
-        ]
-    },
-    {
-        id: uniqueId(),
-        title: "Universities",
-        icon: IconSchool,
-        href: "/admin/universities",
-    },
-    {
-        id: uniqueId(),
-        title: "Packages",
-        icon: IconMoneybag,
-        href: "/admin/packages",
-    },
-    {
-        id: uniqueId(),
-        title: "Account",
-        icon: IconReceipt,
-        children: [
-            {
-                id: uniqueId(),
-                title: "Expenses Types",
-                icon: IconMoneybag,
-                href: "/admin/expenses-types",
-            },
-            {
-                id: uniqueId(),
-                title: "Add Expenses",
-                icon: IconMoneybag,
-                href: "/admin/add-expenses",
-            },
-        ]
-    }
-];
-
-export const TEMP_CEO_MENU_ITEMS = [
+export const SUPER_ADMIN_MENU_ITEMS = [
     // {
     //     id: uniqueId(),
     //     title: "DashBoard",
@@ -469,25 +95,30 @@ export const TEMP_CEO_MENU_ITEMS = [
     },
 ];
 
-export const CONSULTANT_MENU_ITEMS = [
+export const SL_TEAM_MENU_ITEMS = [
+    // {
+    //     id: uniqueId(),
+    //     title: "DashBoard",
+    //     icon: IconCalendar,
+    //     href: "/admin",
+    // },
     {
         id: uniqueId(),
-        title: "Students",
-        icon: IconUsersGroup,
-        children: [
-            {
-                id: uniqueId(),
-                title: "Students",
-                icon: IconUsersGroup,
-                href: "/admin/students",
-            },
-            {
-                id: uniqueId(),
-                title: "Add student",
-                icon: IconUsersGroup,
-                href: "/admin/add-student",
-            },
-        ]
+        title: "Leads",
+        icon: IconReceipt,
+        href: "/admin/leads",
+    },
+    {
+        id: uniqueId(),
+        title: "Inquiries",
+        icon: IconReceipt,
+        href: "/admin/inquiries",
+    },
+    {
+        id: uniqueId(),
+        title: "Countries",
+        icon: IconWorld,
+        href: "/admin/countries",
     },
     {
         id: uniqueId(),
@@ -497,171 +128,49 @@ export const CONSULTANT_MENU_ITEMS = [
     },
     {
         id: uniqueId(),
-        title: "Packages",
-        icon: IconMoneybag,
-        href: "/admin/packages",
-    },
-    {
-        id: uniqueId(),
-        title: "Roster",
-        icon: IconCalendar,
-        href: "/admin/roster",
-    },
-    {
-        id: uniqueId(),
-        title: "All Attendances",
-        icon: IconCalendar,
-        href: "/admin/all-attendance",
-    },
-    {
-        id: uniqueId(),
-        title: "Call Center",
-        icon: IconPhoneCall,
-        href: "/admin/call-center",
-    },
-    {
-        id: uniqueId(),
-        title: "Success Stories",
-        icon: IconTrophy,
-        href: "/admin/success-stories",
-    },
-];
-
-export const OPERATION_MENU_ITEMS = [
-    {
-        id: uniqueId(),
-        title: "Students",
-        icon: IconUsersGroup,
-        children: [
-            {
-                id: uniqueId(),
-                title: "Students",
-                icon: IconUsersGroup,
-                href: "/admin/students",
-            },
-            {
-                id: uniqueId(),
-                title: "Add student",
-                icon: IconUsersGroup,
-                href: "/admin/add-student",
-            },
-        ]
-    },
-    {
-        id: uniqueId(),
-        title: "Universities",
+        title: "Courses",
         icon: IconSchool,
-        href: "/admin/universities",
-    },
-    {
-        id: uniqueId(),
-        title: "Packages",
-        icon: IconMoneybag,
-        href: "/admin/packages",
-    }
-];
-
-export const JUNIOR_CONSULTANT_MENU_ITEMS = [
-    {
-        id: uniqueId(),
-        title: "Students",
-        icon: IconUsersGroup,
-        children: [
-            {
-                id: uniqueId(),
-                title: "Students",
-                icon: IconUsersGroup,
-                href: "/admin/students",
-            },
-            {
-                id: uniqueId(),
-                title: "Add student",
-                icon: IconUsersGroup,
-                href: "/admin/add-student",
-            },
-        ]
-    },
-];
-
-export const CEO_MENU_ITEMS = [
-    {
-        id: uniqueId(),
-        title: "Dashboard",
-        icon: IconLayoutDashboard,
-        href: "/admin",
-    },
-    {
-        id: uniqueId(),
-        title: "Universities",
-        icon: IconSchool,
-        href: "/admin/university",
-    },
-    {
-        id: uniqueId(),
-        title: "Packages",
-        icon: IconBook,
-        href: "/admin/packages",
-    },
-    {
-        id: uniqueId(),
-        title: "Users",
-        icon: IconUsersGroup,
-        href: "/admin/users",
-    },
-    {
-        id: uniqueId(),
-        title: "Students",
-        icon: IconUsersGroup,
-        children: [
-            {
-                id: uniqueId(),
-                title: "Students",
-                icon: IconUsersGroup,
-                href: "/admin/students",
-            },
-            {
-                id: uniqueId(),
-                title: "Add student",
-                icon: IconUsersGroup,
-                href: "/admin/add-student",
-            },
-            {
-                id: uniqueId(),
-                title: "Qualifications Types",
-                icon: IconMoneybag,
-                href: "/admin/qualifications",
-            },
-        ]
+        href: "/admin/courses",
     },
     {
         id: uniqueId(),
         title: "Staff",
         icon: IconUsersGroup,
-        children: [
-            {
-                id: uniqueId(),
-                title: "Staff",
-                icon: IconUsersGroup,
-                href: "/admin/staff",
-            },
-            {
-                id: uniqueId(),
-                title: "Leaves",
-                icon: IconMoneybag,
-                href: "/admin/leaves",
-            },
-        ]
+        href: "/admin/staff",
     },
     {
         id: uniqueId(),
-        title: "Attendance",
-        icon: IconCalendar,
-        href: "/admin/attendance",
-    },
+        title: "Students",
+        icon: IconUsersGroup,
+        href: "/admin/students",
+    }
 ];
 
-export const MANAGER_MENU_ITEMS = [
-
+export const NZ_TEAM_MENU_ITEMS = [
+    // {
+    //     id: uniqueId(),
+    //     title: "DashBoard",
+    //     icon: IconCalendar,
+    //     href: "/admin",
+    // },
+    {
+        id: uniqueId(),
+        title: "Leads",
+        icon: IconReceipt,
+        href: "/admin/leads",
+    },
+    {
+        id: uniqueId(),
+        title: "Inquiries",
+        icon: IconReceipt,
+        href: "/admin/inquiries",
+    },
+    {
+        id: uniqueId(),
+        title: "Countries",
+        icon: IconWorld,
+        href: "/admin/countries",
+    },
     {
         id: uniqueId(),
         title: "Universities",
@@ -670,40 +179,21 @@ export const MANAGER_MENU_ITEMS = [
     },
     {
         id: uniqueId(),
-        title: "Users",
+        title: "Courses",
+        icon: IconSchool,
+        href: "/admin/courses",
+    },
+    {
+        id: uniqueId(),
+        title: "Staff",
         icon: IconUsersGroup,
-        href: "/admin/users",
+        href: "/admin/staff",
     },
     {
         id: uniqueId(),
         title: "Students",
         icon: IconUsersGroup,
-        children: [
-            {
-                id: uniqueId(),
-                title: "Students",
-                icon: IconUsersGroup,
-                href: "/admin/students",
-            },
-            {
-                id: uniqueId(),
-                title: "Add Student",
-                icon: IconUsersGroup,
-                href: "/admin/add-student",
-            },
-            {
-                id: uniqueId(),
-                title: "Qualifications Types",
-                icon: IconMoneybag,
-                href: "/admin/qualifications",
-            },
-        ]
-    },
-    {
-        id: uniqueId(),
-        title: "Attendance",
-        icon: IconCalendar,
-        href: "/admin/attendance",
+        href: "/admin/students",
     },
 ];
 

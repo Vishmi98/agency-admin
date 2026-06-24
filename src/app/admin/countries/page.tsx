@@ -45,29 +45,33 @@ const CountriesPage = () => {
                     <Typography variant="h6" color={theme.palette.text.primary}>
                         Countries
                     </Typography>
-                    <Box display="flex" justifyContent="flex-end">
-                        <Button
-                            variant="contained"
-                            size="small"
-                            onClick={handleClickOpen}
-                            color="primary"
-                            sx={{
-                                backgroundColor: "#1976d2",
-                                borderRadius: "5px",
-                                textTransform: "none",
-                                "&:hover": { backgroundColor: "#115293" },
-                                width: "160px"
-                            }}
-                        >
-                            <AddIcon sx={{ width: 20, height: 20 }} />
-                            Add Country
-                        </Button>
-                        <AddCountryModal
-                            isOpen={open}
-                            onClose={handleClose}
-                            handleReload={handleReload}
-                        />
-                    </Box>
+                    {
+                        user && user.roll === 1 && (
+                            <Box display="flex" justifyContent="flex-end">
+                                <Button
+                                    variant="contained"
+                                    size="small"
+                                    onClick={handleClickOpen}
+                                    color="primary"
+                                    sx={{
+                                        backgroundColor: "#1976d2",
+                                        borderRadius: "5px",
+                                        textTransform: "none",
+                                        "&:hover": { backgroundColor: "#115293" },
+                                        width: "160px"
+                                    }}
+                                >
+                                    <AddIcon sx={{ width: 20, height: 20 }} />
+                                    Add Country
+                                </Button>
+                                <AddCountryModal
+                                    isOpen={open}
+                                    onClose={handleClose}
+                                    handleReload={handleReload}
+                                />
+                            </Box>
+                        )
+                    }
                 </Box>
                 <CountriesTable reload={reloadTable} />
             </Box>
