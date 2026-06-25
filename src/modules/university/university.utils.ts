@@ -21,6 +21,7 @@ export const addUniversityInitialValues: UniversityType = {
     staffId: '',
     rank: '',
     code: '',
+    website: '',
     isPublish: true
 };
 
@@ -59,6 +60,9 @@ export const addUniversityValidationSchema = Yup.object({
 
     email: Yup.string()
         .email('Invalid email address'),
+
+    website: Yup.string()
+        .required('Website is required')
 });
 
 

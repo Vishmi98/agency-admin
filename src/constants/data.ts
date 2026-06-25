@@ -1,4 +1,5 @@
 import {
+    IconHistory,
     IconReceipt,
     IconSchool,
     IconUserPlus,
@@ -92,6 +93,12 @@ export const SUPER_ADMIN_MENU_ITEMS = [
                 href: "/admin/add-student",
             },
         ]
+    },
+    {
+        id: uniqueId(),
+        title: "Activity Logs",
+        icon: IconHistory,
+        href: "/admin/logs",
     },
 ];
 

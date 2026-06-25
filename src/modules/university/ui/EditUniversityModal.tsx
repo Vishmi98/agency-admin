@@ -233,6 +233,18 @@ const EditUniversityModal: React.FC<EditUniversityModalProps> = ({ isOpen, onClo
                                             helperText={touched.email && errors.email}
                                         />
                                     </Grid>
+                                    <Grid item xs={12}>
+                                        <Typography fontSize="12px">Website</Typography>
+                                        <TextBox
+                                            name="website"
+                                            label=""
+                                            as="input"
+                                            type="text"
+                                            fullWidth
+                                            error={touched.website && !!errors.website}
+                                            helperText={touched.website && errors.website}
+                                        />
+                                    </Grid>
                                 </Grid>
                             </DialogContent>
                             <DialogActions

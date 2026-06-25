@@ -46,6 +46,10 @@ const CoursesPage = () => {
     }, [page, limit, search]);
 
     useEffect(() => {
+        fetchCoursesData();
+    }, [page, limit, search]);
+
+    useEffect(() => {
         if (!user) {
             router.push('/');
             return;
@@ -176,9 +180,9 @@ const CoursesPage = () => {
                         limit={limit}
                         onPageChange={handlePageChange}
                         onRowsPerPageChange={handleRowsPerPageChange}
-                        reloadData={() => fetchCoursesData(true, page)}
+                        reloadData={() => fetchCoursesData(true)}
                         selectedCourse={selectedCourse}
-                        setSelectedCourse={(staff) => updateState({ selectedCourse: staff })}
+                        setSelectedCourse={(course) => updateState({ selectedCourse: course })}
                     />
                 </Box>
             </Box>

@@ -11,6 +11,7 @@ interface University extends Document {
     staffId: number;
     rank: number;
     code: number;
+    website: string;
     createdDate: Date;
     avatarPath?: string;
     avatarFileId?: string;
@@ -28,6 +29,7 @@ const UniversitySchema = new Schema<University>({
     code: { type: Number, required: true },
     phoneNumber: { type: String, required: true },
     email: { type: String },
+    website: { type: String },
     isPublish: { type: Boolean, default: false },
     createdDate: { type: Date, default: Date.now },
 });

@@ -7,8 +7,9 @@ import EditIcon from '@mui/icons-material/Edit';
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
 
 import Course from './Course';
-import { CourseDataType, CourseTableProps } from '../courses.types';
+import CoursePost from './CoursePost';
 import EditCourseModal from './EditCourseModal';
+import { CourseDataType, CourseTableProps } from '../courses.types';
 
 import { getCookieUser } from '@/utils/cookie.util';
 import { logActivity } from '@/utils/logActivity';
@@ -29,14 +30,16 @@ const CoursesTable: React.FC<CourseTableProps> = ({
     const [expandedRows, setExpandedRows] = useState<number[]>([]);
     const [openEditModal, setOpenEditModal] = useState(false);
     const [openPreviewModal, setOpenPreviewModal] = useState(false);
+    const [openPostPreviewModal, setOpenPostPreviewModal] = useState(false);
     const user = getCookieUser()
 
     const columns = [
-        { label: "Course ID", key: "id", width: "10%", align: "center" as const },
+        { label: "Course ID", key: "id", width: "5%", align: "center" as const },
         { label: "Title", key: "title", width: "30%", align: "left" as const },
         { label: "University", key: "universityInfo.name", width: "30%", align: "left" as const },
         { label: "Country", key: "country", width: "15%", align: "left" as const },
-        { label: "", key: "actions", width: "5%", align: "center" as const },
+        { label: "Pdf", key: "actions", width: "5%", align: "center" as const },
+        { label: "Post", key: "actions", width: "5%", align: "center" as const },
         { label: "", key: "actions", width: "5%", align: "center" as const },
         { label: "", key: "actions", width: "5%", align: "center" as const },
     ];
@@ -79,6 +82,19 @@ const CoursesTable: React.FC<CourseTableProps> = ({
         logActivity({
             userId: user ? user.id : 0,
             action: "PREVIEW_COURSE_CLICK",
+            path: "/modules/courses/ui/CoursesTable",
+            method: "CLIENT",
+            meta: { courseID: course.id },
+        });
+    };
+
+    const handlePostPreviewClick = (course: CourseDataType) => {
+        setSelectedCourse(course);
+        setOpenPostPreviewModal(true);
+
+        logActivity({
+            userId: user ? user.id : 0,
+            action: "COURSE_POST_PREVIEW_CLICK",
             path: "/modules/courses/ui/CoursesTable",
             method: "CLIENT",
             meta: { courseID: course.id },
@@ -320,17 +336,22 @@ const CoursesTable: React.FC<CourseTableProps> = ({
                             "-"}
                     </TableCell>
 
+                    <TableCell align="right">
+                        <IconButton onClick={() => handlePreviewClick(course)}>
+                            <RemoveRedEyeIcon fontSize="small" />
+                        </IconButton>
+                    </TableCell>
+                    <TableCell align="right">
+                        <IconButton onClick={() => handlePostPreviewClick(course)}>
+                            <RemoveRedEyeIcon fontSize="small" />
+                        </IconButton>
+                    </TableCell>
                     <TableCell>
                         {user && user.roll === 1 && (
                             <IconButton onClick={() => handleEditClick(course)}>
                                 <EditIcon fontSize="small" />
                             </IconButton>
                         )}
-                    </TableCell>
-                    <TableCell align="right">
-                        <IconButton onClick={() => handlePreviewClick(course)}>
-                            <RemoveRedEyeIcon fontSize="small" />
-                        </IconButton>
                     </TableCell>
                     <TableCell align="center">
                         <IconButton
@@ -368,60 +389,66 @@ const CoursesTable: React.FC<CourseTableProps> = ({
 
     return (
         <>
-            <Box>
-                <TableContainer
-                    component={Paper}
-                    elevation={0}
-                    sx={{ maxHeight: 370, overflowY: "auto", borderRadius: "5px" }}
+            <TableContainer
+                component={Paper}
+                elevation={0}
+                sx={{
+                    maxHeight: 370,
+                    overflowY: "auto",
+                    borderRadius: "5px",
+                }}
+            >
+                <Table
+                    stickyHeader
+                    sx={{
+                        minWidth: 700,
+                        borderCollapse: "collapse",
+                        "& th": {
+                            fontWeight: "bold",
+                            fontSize: "12px",
+                            borderBottom: "1px solid #ddd",
+                            py: 1,
+                        },
+                        "& td": {
+                            fontSize: "12px",
+                            py: 1,
+                        },
+                    }}
                 >
-                    <Table
-                        stickyHeader
-                        sx={{
-                            minWidth: 700,
-                            borderCollapse: "collapse",
-                            "& th": {
-                                fontWeight: "bold",
-                                fontSize: 12,
-                                borderBottom: "1px solid #ddd",
-                                py: 1,
-                                backgroundColor: "#fff",
-                            },
-                            "& td": { fontSize: 12, py: 1 },
-                        }}
-                    >
-                        <TableHead>
-                            <TableRow>
-                                {columns.map((col) => (
-                                    <TableCell
-                                        key={col.key}
-                                        align={col.align}
-                                        sx={{
-                                            fontWeight: "bold",
-                                            fontSize: 12,
-                                            backgroundColor: "#fff",
-                                            borderBottom: "1px solid #ddd",
-                                            width: col.width
-                                        }}
-                                    >
-                                        {col.label}
-                                    </TableCell>
-                                ))}
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>{renderRows()}</TableBody>
-                    </Table>
-                </TableContainer>
+                    <TableHead>
+                        <TableRow>
+                            {columns.map((col) => (
+                                <TableCell
+                                    key={col.key}
+                                    align={col.align}
+                                    sx={{
+                                        fontWeight: "bold",
+                                        fontSize: "12px",
+                                        backgroundColor: "#fff",
+                                        top: 0,
+                                        zIndex: 2,
+                                        borderBottom: "1px solid #ddd",
+                                        width: col.width,
+                                    }}
+                                >
+                                    {col.label}
+                                </TableCell>
+                            ))}
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>{renderRows()}</TableBody>
+                </Table>
+            </TableContainer>
 
-                <TablePagination
-                    rowsPerPageOptions={[5, 10, 15]}
-                    component="div"
-                    count={totalRows}
-                    rowsPerPage={limit}
-                    page={page}
-                    onPageChange={(e, newPage) => onPageChange(newPage)}
-                    onRowsPerPageChange={(e) => onRowsPerPageChange(parseInt(e.target.value, 10))}
-                />
-            </Box>
+            <TablePagination
+                rowsPerPageOptions={[5, 10, 15]}
+                component="div"
+                count={totalRows}
+                rowsPerPage={limit}
+                page={page}
+                onPageChange={(e, newPage) => onPageChange(newPage)}
+                onRowsPerPageChange={(e) => onRowsPerPageChange(parseInt(e.target.value, 10))}
+            />
 
             {openEditModal && selectedCourse && (
                 <EditCourseModal
@@ -443,6 +470,22 @@ const CoursesTable: React.FC<CourseTableProps> = ({
                         <Course
                             course={selectedCourse}
                             setIsModalOpen={setOpenPreviewModal}
+                        />
+                    )}
+                </DialogContent>
+            </Dialog>
+
+            <Dialog
+                open={openPostPreviewModal}
+                onClose={() => setOpenPostPreviewModal(false)}
+                maxWidth="md"
+                fullWidth
+            >
+                <DialogContent>
+                    {selectedCourse && (
+                        <CoursePost
+                            course={selectedCourse}
+                            setIsModalOpen={setOpenPostPreviewModal}
                         />
                     )}
                 </DialogContent>

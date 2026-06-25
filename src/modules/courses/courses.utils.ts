@@ -110,11 +110,9 @@ export const addCourseValidationSchema = Yup.object().shape({
     .of(
       Yup.string()
         .trim()
-        .required("Specialization is required")
         .min(2, "Specialization must be at least 2 characters")
         .max(100, "Specialization must not exceed 100 characters")
     )
-    .min(1, "At least one specialization is required")
     .max(15, "Maximum 15 specializations allowed"),
 
   intakes: Yup.array()

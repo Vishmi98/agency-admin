@@ -31,6 +31,7 @@ export async function POST(req: NextRequest) {
             staffId,
             rank,
             code,
+            website
         } = decryptedBody;
 
         if (!name || !address || !countryId || !phoneNumber || !staffId || !rank || !code) {
@@ -62,6 +63,7 @@ export async function POST(req: NextRequest) {
             staffId,
             rank,
             code,
+            website,
             createdDate: new Date()
         });
 

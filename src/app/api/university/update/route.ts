@@ -29,6 +29,7 @@ export async function POST(req: NextRequest) {
             staffId,
             rank,
             code,
+            website
         } = decryptedBody;
 
         // 🔴 Validate required fields
@@ -77,6 +78,7 @@ export async function POST(req: NextRequest) {
                 staffId,
                 rank,
                 code,
+                website
             },
             { new: true }
         )

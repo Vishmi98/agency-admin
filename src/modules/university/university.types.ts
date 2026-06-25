@@ -14,6 +14,7 @@ export type UniversityType = {
     code: string | number;
     avatarPath?: string;
     avatarFileId?: string;
+    website: string;
 }
 
 export type UniversitySearchValue = {
@@ -47,6 +48,7 @@ export type UniversityDataType = {
     phoneNumber: string;
     email: string;
     isPublish: boolean;
+    website: string;
     countryInfo?: {
         title: {
             SN: string;

@@ -60,12 +60,36 @@ const UniversitiesTable: React.FC<TableProps> = ({ reload }) => {
   const onPageChange = (_: unknown, newPage: number) => {
     setPage(newPage);
     fetchUniversityData(newPage + 1);
+
+    if (user) {
+      logActivity({
+        userId: user.id,
+        action: "UNIVERSITIES_PAGE_CHANGE",
+        path: "/modules/university/ui/UniversitiesTable",
+        method: "CLIENT",
+        meta: {
+          page: newPage
+        }
+      });
+    }
   };
 
   const onRowsPerPageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setLimit(parseInt(e.target.value, 10));
     setPage(0);
-  };
+
+    if (user) {
+      logActivity({
+        userId: user.id,
+        action: "UNIVERSITIES_LIMIT_CHANGE",
+        path: "/modules/university/ui/UniversitiesTable",
+        method: "CLIENT",
+        meta: {
+          limit: e.target.value
+        }
+      });
+    };
+  }
 
   const handleEditClick = (uni: UniversityDataType) => {
     setSelectedUni(uni);
@@ -74,7 +98,7 @@ const UniversitiesTable: React.FC<TableProps> = ({ reload }) => {
     logActivity({
       userId: user ? user.id : 0,
       action: "EDIT_UNIVERSITY_CLICK",
-      endpoint: "/modules/university/ui/UniversitiesTable",
+      path: "/modules/university/ui/UniversitiesTable",
       method: "CLIENT",
       meta: { uniId: uni.id },
     });
@@ -87,11 +111,9 @@ const UniversitiesTable: React.FC<TableProps> = ({ reload }) => {
 
   const columns = [
     { label: "University Name", key: "name", width: "20%", align: "left" as const },
-    { label: "Code", key: "code", width: "10%", align: "center" as const },
-    { label: "Rank", key: "rank", width: "5%", align: "center" as const },
     { label: "Email", key: "email", width: "15%", align: "left" as const },
-    { label: "Address", key: "address", width: "25%", align: "left" as const },
-    { label: "Country", key: "countryInfo", width: "10%", align: "left" as const },
+    { label: "Address", key: "address", width: "30%", align: "left" as const },
+    { label: "Website", key: "website", width: "10%", align: "left" as const },
     { label: "Phone", key: "phoneNumber", width: "10%", align: "left" as const },
     { label: "", key: "edit", width: "5%", align: "center" as const },
   ];
@@ -134,28 +156,20 @@ const UniversitiesTable: React.FC<TableProps> = ({ reload }) => {
               value = uni.name;
               break;
 
-            case "code":
-              value = uni.code;
-              break;
-
-            case "rank":
-              value = uni.rank;
-              break;
-
             case "email":
               value = uni.email;
               break;
 
             case "address":
-              value = uni.address;
+              value = uni.address + ", " + uni.countryInfo?.title.EN;
               break;
 
             case "phoneNumber":
               value = uni.phoneNumber;
               break;
 
-            case "countryInfo":
-              value = uni.countryInfo?.title?.EN || "-";
+            case "website":
+              value = uni.website || "-";
               break;
 
             case "edit":
@@ -261,4 +275,4 @@ const UniversitiesTable: React.FC<TableProps> = ({ reload }) => {
   );
 };
 
-export default UniversitiesTable;
+export default UniversitiesTable

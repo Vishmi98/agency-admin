@@ -1,5 +1,3 @@
-// models/activity-log.model.ts
-
 import mongoose from "mongoose";
 
 const ActivityLogSchema = new mongoose.Schema({
@@ -16,6 +14,16 @@ const ActivityLogSchema = new mongoose.Schema({
 
     createdAt: { type: Date, default: Date.now },
 });
+
+ActivityLogSchema.virtual('userInfo', {
+    ref: 'Staff',
+    localField: 'userId',
+    foreignField: 'id',
+    justOne: true,
+});
+
+ActivityLogSchema.set("toObject", { virtuals: true });
+ActivityLogSchema.set("toJSON", { virtuals: true });
 
 const ActivityLogModel =
     mongoose.models.ActivityLog || mongoose.model("ActivityLog", ActivityLogSchema);
