@@ -478,8 +478,13 @@ const CoursesTable: React.FC<CourseTableProps> = ({
             <Dialog
                 open={openPostPreviewModal}
                 onClose={() => setOpenPostPreviewModal(false)}
-                maxWidth="md"
+                maxWidth="lg"
                 fullWidth
+                sx={{
+                    "& .MuiDialog-paper": {
+                        maxWidth: "1150px",
+                    },
+                }}
             >
                 <DialogContent>
                     {selectedCourse && (

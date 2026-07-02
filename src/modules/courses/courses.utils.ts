@@ -143,13 +143,9 @@ export const addCourseValidationSchema = Yup.object().shape({
           .max(50, "Test name must not exceed 50 characters"),
 
         overallScore: Yup.number()
-          .required("Overall score is required")
-          .min(0, "Overall score cannot be negative")
           .max(100, "Overall score is too high"),
 
         minimumBand: Yup.number()
-          .required("Minimum band score is required")
-          .min(0, "Minimum band score cannot be negative")
           .max(100, "Minimum band score is too high"),
       })
     )
