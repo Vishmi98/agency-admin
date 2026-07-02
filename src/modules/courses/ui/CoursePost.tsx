@@ -448,19 +448,35 @@ const CoursePost: React.FC<CourseProp> = ({ course, setIsModalOpen }) => {
                                                 </TableRow>
                                             </TableHead>
                                             <TableBody>
-                                                {course.englishRequirement?.length ? (
-                                                    course.englishRequirement.map((eng, idx) => (
-                                                        <TableRow key={idx}>
-                                                            <TableCell sx={{ py: 0.5, fontSize: "13px" }}>{eng.test}</TableCell>
-                                                            <TableCell align="center" sx={{ py: 0.5, fontSize: "13px" }}>{eng.overallScore ? eng.overallScore : '-'}</TableCell>
-                                                            <TableCell align="center" sx={{ py: 0.5, fontSize: "13px" }}>{eng.minimumBand ? eng.minimumBand : '-'}</TableCell>
-                                                        </TableRow>
-                                                    ))
+                                                {course.englishRequirement?.filter(
+                                                    (eng) => eng.overallScore || eng.minimumBand
+                                                ).length ? (
+                                                    course.englishRequirement
+                                                        .filter((eng) => eng.overallScore || eng.minimumBand)
+                                                        .map((eng, idx) => (
+                                                            <TableRow key={idx}>
+                                                                <TableCell sx={{ py: 0.5, fontSize: "13px" }}>
+                                                                    {eng.test}
+                                                                </TableCell>
+                                                                <TableCell align="center" sx={{ py: 0.5, fontSize: "13px" }}>
+                                                                    {eng.overallScore ?? "-"}
+                                                                </TableCell>
+                                                                <TableCell align="center" sx={{ py: 0.5, fontSize: "13px" }}>
+                                                                    {eng.minimumBand ?? "-"}
+                                                                </TableCell>
+                                                            </TableRow>
+                                                        ))
                                                 ) : (
                                                     <TableRow>
-                                                        <TableCell sx={{ py: 0.5, fontSize: "13px" }}>IELTS Academic</TableCell>
-                                                        <TableCell align="center" sx={{ py: 0.5, fontSize: "13px" }}>6.5</TableCell>
-                                                        <TableCell align="center" sx={{ py: 0.5, fontSize: "13px" }}>6.0</TableCell>
+                                                        <TableCell sx={{ py: 0.5, fontSize: "13px" }}>
+                                                            IELTS Academic
+                                                        </TableCell>
+                                                        <TableCell align="center" sx={{ py: 0.5, fontSize: "13px" }}>
+                                                            6.5
+                                                        </TableCell>
+                                                        <TableCell align="center" sx={{ py: 0.5, fontSize: "13px" }}>
+                                                            6.0
+                                                        </TableCell>
                                                     </TableRow>
                                                 )}
                                             </TableBody>
