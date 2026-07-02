@@ -30,6 +30,7 @@ import WorkIcon from '@mui/icons-material/Work';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
 import { CourseProp } from '../courses.types';
+
 import { getCookieUser } from '@/utils/cookie.util';
 import { logActivity } from '@/utils/logActivity';
 
@@ -40,8 +41,6 @@ const CoursePost: React.FC<CourseProp> = ({ course, setIsModalOpen }) => {
     // Primary Colors matched from the flyer
     const PRIMARY_DARK = '#0a2e5c';
     const SECONDARY_BLUE = '#0284c7';
-    const ACCENT_LIGHT = '#e0f2fe';
-    const TEXT_MUTED = '#4b5563';
 
     const handleDownloadImage = async () => {
         const html2canvas = (await import("html2canvas")).default;
@@ -476,7 +475,7 @@ const CoursePost: React.FC<CourseProp> = ({ course, setIsModalOpen }) => {
                                         <Typography variant="body1" sx={{ fontWeight: 700, color: PRIMARY_DARK }}>PROGRAM FEATURES</Typography>
                                     </Stack>
                                     <Stack spacing={0.5}>
-                                        {(course.features?.slice(0, 5) || []).map((feat, index) => (
+                                        {(course.features?.slice(0, 8) || []).map((feat, index) => (
                                             <Typography key={index} variant="body1" sx={{}}>
                                                 • {feat}
                                             </Typography>
