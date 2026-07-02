@@ -153,7 +153,7 @@ const CoursePost: React.FC<CourseProp> = ({ course, setIsModalOpen }) => {
             >
                 {/* 1. HERO SECTION WITH IMAGE & HERO TITLE */}
                 <Box sx={{ flexShrink: 0 }}>
-                    <Grid container sx={{ position: 'relative', minHeight: '320px' }}>
+                    <Grid container sx={{ position: 'relative', minHeight: '325px' }}>
                         {/* Left Branding and Title Column */}
                         <Grid item xs={12} md={6} sx={{ px: 4, display: 'flex', flexDirection: 'column', justifyContent: 'center', zIndex: 2 }}>
                             {/* University Branding Mock */}
@@ -168,9 +168,10 @@ const CoursePost: React.FC<CourseProp> = ({ course, setIsModalOpen }) => {
                                             lineHeight: 1.1,
                                             letterSpacing: '0.5px',
                                             fontFamily: '"Times New Roman", Times, serif',
+                                            textTransform: 'uppercase',
                                         }}
                                     >
-                                        UNIVERSITY
+                                        {course.universityInfo?.name || ""}
                                     </Typography>
                                     <Typography variant="body1" sx={{ fontWeight: 100 }}>
                                         Inspiring Futures
@@ -204,7 +205,7 @@ const CoursePost: React.FC<CourseProp> = ({ course, setIsModalOpen }) => {
                             md={6}
                             sx={{
                                 position: "relative",
-                                minHeight: { xs: 250, md: 320 },
+                                minHeight: { xs: 250, md: 325 },
                                 // Ensure the parent container has an explicit height or overflow hidden for html2canvas
                                 overflow: 'hidden',
                                 bgcolor: "#ffffff"
@@ -341,8 +342,7 @@ const CoursePost: React.FC<CourseProp> = ({ course, setIsModalOpen }) => {
                 <Box
                     sx={{
                         flex: 1,
-                        px: 4,
-                        py: 2,
+                        p: 4,
                         display: "flex",
                         overflow: "hidden",
                         bgcolor: "#ffffff"
